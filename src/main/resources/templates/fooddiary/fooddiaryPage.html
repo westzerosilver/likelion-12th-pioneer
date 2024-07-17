@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Food Diary</title>
+</head>
+<body>
+<h1>Food Diary</h1>
+<form th:action="@{/api/fooddiaries}" th:object="${foodDiary}" method="post" enctype="multipart/form-data">
+    <div>
+        <label>시간</label>
+        <input type="date" th:field="*{date}" />
+        <button type="button">▲</button>
+        <button type="button">▼</button>
+    </div>
+    <div>
+        <label>메뉴</label>
+        <div>
+            <label>메뉴명:</label>
+            <input type="text" th:field="*{menuName}" />
+        </div>
+    </div>
+    <div>
+        <input type="file" th:field="*{photoUrl}" />
+    </div>
+    <div>
+        <label>누구와 먹었나요?</label>
+        <div>
+            <input type="radio" th:field="*{eatingWith}" value="ALONE" /> 혼자
+            <input type="radio" th:field="*{eatingWith}" value="FRIEND" /> 친구
+            <input type="radio" th:field="*{eatingWith}" value="PARTNER" /> 연인
+            <input type="radio" th:field="*{eatingWith}" value="COLLEAGUE" /> 직장동료
+            <input type="radio" th:field="*{eatingWith}" value="OTHER" /> 기타
+        </div>
+    </div>
+    <div>
+        <label>어디에서 먹었나요?</label>
+        <div>
+            <input type="radio" th:field="*{eatingWith}" value="HOME" /> 집
+            <input type="radio" th:field="*{eatingWith}" value="RESTAURANT" /> 식당
+            <input type="radio" th:field="*{eatingWith}" value="SCHOOL" /> 학교
+            <input type="radio" th:field="*{eatingWith}" value="WORK" /> 직장
+            <input type="radio" th:field="*{eatingWith}" value="OTHER" /> 기타
+        </div>
+    </div>
+    <div>
+        <label>식사 전 기분은 어때요?</label>
+        <div>
+            <input type="radio" th:field="*{feeling}" value="COMFORTABLE" /> 편안해요
+            <input type="radio" th:field="*{feeling}" value="HAPPY" /> 즐거워요
+            <input type="radio" th:field="*{feeling}" value="EASY" /> 무난해요
+            <input type="radio" th:field="*{feeling}" value="GUILT" /> 죄책감들어요
+            <input type="radio" th:field="*{feeling}" value="IRRITATE" /> 짜증나요
+            <input type="radio" th:field="*{feeling}" value="ANXIOUS" /> 불안해요
+            <input type="radio" th:field="*{feeling}" value="LONELY" /> 외로워요
+        </div>
+    </div>
+    <div>
+        <label>자, 이제 식사하러 가볼까요?</label>
+    </div>
+    <div>
+        <button type="submit">식사 시작하기</button>
+    </div>
+</form>
+</body>
+</html>
