@@ -6,46 +6,33 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
-public class FoodDiary {
+public class FoodComplete {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalTime time;
-
-    private String menuName;
-
-    private String photoUrl;
-
-    @Enumerated(EnumType.STRING)
-    private EatingWith eatingWith;
-
-    @Enumerated(EnumType.STRING)
-    private EatingWhere eatingWhere;
-
     @Enumerated(EnumType.STRING)
     private Feeling feeling;
 
+    @ElementCollection(targetClass = Symptom.class)
+    @CollectionTable(name = "food_complete_symptom", joinColumns = @JoinColumn(name = "food_complete_id"))
+    @Enumerated(EnumType.STRING)
+    private Set<Symptom> symptoms;
 
-    public enum EatingWith {
-        ALONE, FRIEND, PARTNER, COLLEAGUE, OTHER
-    }
-
-    public enum EatingWhere {
-        HOME, RESTAURANT, SCHOOL, WORK, OTHER
-    }
+    private String memo;
 
     public enum Feeling {
         COMFORTABLE, HAPPY, EASY, GUILT, IRRITATE, ANXIOUS, LONELY
     }
 
+    public enum Symptom {
+        VOMIT, MEDICINE, BINGE, REDUCE, SPIT, DIETMEDICINE, EXERCISE, OTHER, NOTHING
+    }
 }
-

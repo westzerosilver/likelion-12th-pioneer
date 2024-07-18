@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Food Complete</title>
+</head>
+<body>
+<h1>식사 후 기분을 기록해주세요!</h1>
+<form th:action="@{/foodcomplete}" th:object="${foodComplete}" method="post">
+    <div>
+        <label>기분</label>
+        <div>
+            <input type="radio" th:field="*{feeling}" value="COMFORTABLE" /> 편안해요
+            <input type="radio" th:field="*{feeling}" value="HAPPY" /> 즐거워요
+            <input type="radio" th:field="*{feeling}" value="EASY" /> 무난해요
+            <input type="radio" th:field="*{feeling}" value="GUILT" /> 죄책감들어요
+            <input type="radio" th:field="*{feeling}" value="IRRITATE" /> 짜증나요
+            <input type="radio" th:field="*{feeling}" value="ANXIOUS" /> 불안해요
+            <input type="radio" th:field="*{feeling}" value="LONELY" /> 외로워요
+        </div>
+    </div>
+    <div>
+        <label>증상</label>
+        <div>
+            <input type="checkbox" th:field="*{symptoms}" value="VOMIT" /> 구토
+            <input type="checkbox" th:field="*{symptoms}" value="MEDICINE" /> 변비약복용
+            <input type="checkbox" th:field="*{symptoms}" value="BINGE" /> 폭식
+            <input type="checkbox" th:field="*{symptoms}" value="REDUCE" /> 양 줄이기
+            <input type="checkbox" th:field="*{symptoms}" value="SPIT" /> 씹고 뱉기
+            <input type="checkbox" th:field="*{symptoms}" value="DIETMEDICINE" /> 다이어트약 복용
+            <input type="checkbox" th:field="*{symptoms}" value="EXERCISE" /> 과한 운동
+            <input type="checkbox" th:field="*{symptoms}" value="OTHER" /> 기타
+            <input type="checkbox" th:field="*{symptoms}" value="NOTHING" /> 증상이 없었어요!
+        </div>
+    </div>
+    <div>
+        <label>메모</label>
+        <textarea th:field="*{memo}"></textarea>
+    </div>
+    <div>
+        <button type="submit">제출</button>
+    </div>
+</form>
+</body>
+</html>

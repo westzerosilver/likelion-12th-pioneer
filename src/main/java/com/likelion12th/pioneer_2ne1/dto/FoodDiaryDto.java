@@ -4,12 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Getter
 @Setter
 public class FoodDiaryDto {
     private Long id;
-    private LocalDate date;
+    private LocalTime time;
     private String menuName;
     private String photoUrl;
     private String eatingWith;
@@ -24,12 +25,12 @@ public class FoodDiaryDto {
         this.id = id;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalTime getTime() {
+        return time;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setTime(LocalTime time) {
+        this.time = time;
     }
 
     public String getMenuName() {

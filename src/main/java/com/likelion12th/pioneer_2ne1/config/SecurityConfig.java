@@ -47,6 +47,8 @@ public class SecurityConfig {
                         .requestMatchers("/members/login").anonymous()
                         .requestMatchers("/members/logout").authenticated()
                         .requestMatchers("/fooddiaries").authenticated()
+                        .requestMatchers("/fooddiaries/foodguide").authenticated()
+                        .requestMatchers("/foodcomplete").authenticated()
                         .anyRequest().permitAll()
                 );
 

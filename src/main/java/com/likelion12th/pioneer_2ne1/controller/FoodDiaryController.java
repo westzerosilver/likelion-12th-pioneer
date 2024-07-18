@@ -44,4 +44,9 @@ public class FoodDiaryController {
         foodDiaryService.deleteFoodDiary(id);
         return "redirect:/fooddiaries";
     }
+
+    @GetMapping("/foodguide")
+    public String getFoodGuidePage() {
+        return "fooddiary/foodguidePage";
+    }
 }

@@ -5,7 +5,7 @@
       layout:decorate="~{layouts/layout1}">
 
 <div layout:fragment="content">
-    <h1>메인페이지입니다.</h1>
+    <h2>데일리 식사 일기</h2>
 </div>
 
 <div>
@@ -16,5 +16,8 @@
     <button type="button" class="btn btn-primary" sec:authorize="isAuthenticated()" onClick="location.href='/members/logout'">로그아웃</button>
 </div>
 
+<div>
+    <button type="button" class="btn btn-primary" sec:authorize="isAuthenticated()" onClick="location.href='/fooddiaries'">식사 일기 쓰기</button>
+</div>
 
 </html>
