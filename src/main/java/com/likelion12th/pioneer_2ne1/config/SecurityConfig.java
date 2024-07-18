@@ -49,6 +49,8 @@ public class SecurityConfig {
                         .requestMatchers("/members/mypage").authenticated()
                         .requestMatchers("/members/delete").authenticated()
                         .requestMatchers("/fooddiaries").authenticated()
+                        .requestMatchers("/fooddiaries/foodguide").authenticated()
+                        .requestMatchers("/foodcomplete").authenticated()
                         .anyRequest().permitAll()
                 );
 

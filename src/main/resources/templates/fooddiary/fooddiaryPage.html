@@ -3,15 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <title>Food Diary</title>
+    <style>
+        .time-control {
+            display: flex;
+            align-items: center;
+        }
+        .time-control input {
+            width: 120px;
+        }
+        .time-control button {
+            margin-left: 5px;
+            margin-right: 5px;
+            width: 30px;
+            height: 30px;
+            font-size: 18px;
+        }
+    </style>
+    <script>
+        function incrementTime(increment) {
+            const timeInput = document.getElementById('time');
+            let time = timeInput.value;
+            if (!time) {
+                time = new Date().toISOString().substr(11, 5);
+            }
+            const [hours, minutes] = time.split(':').map(Number);
+            let newMinutes = minutes + increment;
+            let newHours = hours;
+
+            if (newMinutes >= 60) {
+                newHours += 1;
+                newMinutes -= 60;
+            } else if (newMinutes < 0) {
+                newHours -= 1;
+                newMinutes += 60;
+            }
+
+            if (newHours >= 24) {
+                newHours -= 24;
+            } else if (newHours < 0) {
+                newHours += 24;
+            }
+
+            timeInput.value = `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const timeInput = document.getElementById('time');
+            if (!timeInput.value) {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                timeInput.value = `${hours}:${minutes}`;
+            }
+        });
+    </script>
 </head>
 <body>
-<h1>Food Diary</h1>
-<form th:action="@{/api/fooddiaries}" th:object="${foodDiary}" method="post" enctype="multipart/form-data">
+<form th:action="@{/fooddiaries}" th:object="${foodDiary}" method="post" enctype="multipart/form-data">
     <div>
         <label>시간</label>
-        <input type="date" th:field="*{date}" />
-        <button type="button">▲</button>
-        <button type="button">▼</button>
+        <div class="time-control">
+            <input type="time" id="time" th:field="*{time}" />
+            <button type="button" onclick="incrementTime(1)">▲</button>
+            <button type="button" onclick="incrementTime(-1)">▼</button>
+        </div>
     </div>
     <div>
         <label>메뉴</label>
@@ -59,7 +114,7 @@
         <label>자, 이제 식사하러 가볼까요?</label>
     </div>
     <div>
-        <button type="submit">식사 시작하기</button>
+        <button type="button" onclick="location.href='/fooddiaries/foodguide'">식사 시작하기</button>
     </div>
 </form>
 </body>
