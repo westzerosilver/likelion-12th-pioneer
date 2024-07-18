@@ -46,6 +46,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/members/login").anonymous()
                         .requestMatchers("/members/logout").authenticated()
+                        .requestMatchers("/members/mypage").authenticated()
+                        .requestMatchers("/members/delete").authenticated()
                         .requestMatchers("/fooddiaries").authenticated()
                         .requestMatchers("/fooddiaries/foodguide").authenticated()
                         .requestMatchers("/foodcomplete").authenticated()
