@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Member Information</title>
+</head>
+<body>
+<h1>Edit Member Information</h1>
+<form th:action="@{/members/update}" th:object="${memberFormDto}" method="post">
+    <div>
+        <label>이메일:</label>
+        <input type="text" th:field="*{email}" readonly="readonly" />
+        <p th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{email}" class="fieldError">Incorrect data</p>
+    </div>
+    <div>
+        <label>이름:</label>
+        <input type="text" th:field="*{name}" />
+        <p th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{name}" class="fieldError">Incorrect data</p>
+    </div>
+    <div>
+        <label>비밀번호 (비워두면 변경되지 않습니다):</label>
+        <input type="password" th:field="*{password}" />
+        <p th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{password}" class="fieldError">Incorrect data</p>
+    </div>
+    <div class="form-group">
+        <label th:for="confirmPassword">비밀번호 재입력</label>
+        <input type="password" th:field="*{confirmPassword}" class="form-control" placeholder="비밀번호 재입력">
+        <p th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="fieldError">Incorrect data</p>
+    </div>
+    <div>
+        <button type="submit">수정하기</button>
+    </div>
+</form>
+<div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+    <p th:text="${errorMessage}"></p>
+</div>
+</body>
+</html>

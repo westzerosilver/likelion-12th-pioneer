@@ -9,6 +9,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
+
 @Entity
 @EntityListeners(value = {AutoCloseable.class})
 @Table(name="member")
@@ -71,11 +73,6 @@ public class Member extends Base{
         return this.role.getKey();
     }
 
-    public Member update(String name) {
-        this.name = name;
-
-        return this;
-    }
 
 
 }

@@ -1,15 +1,30 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head>
+    <meta charset="UTF-8">
     <title>My Page</title>
 </head>
-
 <body>
 <h1>My Page</h1>
-<p><strong>Name:</strong> <span th:text="${member.name}"></span></p>
-<p><strong>Email:</strong> <span th:text="${member.email}"></span></p>
-<a href="/">Home</a>
-</body>
+<div>
+    <label>가입일:</label>
+    <span th:text="${member.regTime}"></span>
+</div>
+<div>
+    <label>이메일:</label>
+    <span th:text="${member.email}"></span>
+</div>
+<div>
+    <label>이름:</label>
+    <span th:text="${member.name}"></span>
+</div>
+<div>
+    <button type="button" onClick="location.href='/members/update'">회원 정보 수정</button>
+</div>
+<div>
+    <button type="button" onClick="location.href='/members/delete'">회원 탈퇴</button>
+</div>
 
+
+</body>
 </html>
