@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원 탈퇴</title>
+</head>
+<body>
+<h1>회원 탈퇴</h1>
+<div>
+    <p>정말 탈퇴하겠습니까?</p>
+    <form th:action="@{/members/delete}" method="post">
+        <button type="submit">확인</button>
+    </form>
+    <button type="button" onclick="window.location.href='/members/mypage'">취소</button>
+</div>
+</body>
+</html>
