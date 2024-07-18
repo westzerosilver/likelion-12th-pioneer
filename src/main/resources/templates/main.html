@@ -4,6 +4,11 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/layout1}">
 
+<head>
+    <meta charset="UTF-8">
+    <title>데일리 식사 일기</title>
+</head>
+<body>
 <div layout:fragment="content">
     <h2>데일리 식사 일기</h2>
 </div>
@@ -20,4 +25,9 @@
     <button type="button" class="btn btn-primary" sec:authorize="isAuthenticated()" onClick="location.href='/fooddiaries'">식사 일기 쓰기</button>
 </div>
 
+<div>
+    <button type="button" class="btn btn-primary" sec:authorize="isAuthenticated()" onClick="location.href='/members/mypage'">마이페이지</button>
+</div>
+
+</body>
 </html>
