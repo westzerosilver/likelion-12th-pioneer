@@ -10,6 +10,7 @@ import java.time.LocalTime;
 @Setter
 public class FoodDiaryDto {
     private Long id;
+    private LocalDate date;
     private LocalTime time;
     private String menuName;
     private String photoUrl;
@@ -23,6 +24,14 @@ public class FoodDiaryDto {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public LocalTime getTime() {

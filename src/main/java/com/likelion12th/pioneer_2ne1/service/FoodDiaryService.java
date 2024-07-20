@@ -39,6 +39,7 @@ public class FoodDiaryService {
     private FoodDiaryDto convertToDto(FoodDiary foodDiary) {
         FoodDiaryDto foodDiaryDto = new FoodDiaryDto();
         foodDiaryDto.setId(foodDiary.getId());
+        foodDiaryDto.setDate(foodDiary.getDate());
         foodDiaryDto.setTime(foodDiary.getTime());
         foodDiaryDto.setMenuName(foodDiary.getMenuName());
         foodDiaryDto.setPhotoUrl(foodDiary.getPhotoUrl());
@@ -51,6 +52,7 @@ public class FoodDiaryService {
     private FoodDiary convertToEntity(FoodDiaryDto foodDiaryDto) {
         FoodDiary foodDiary = new FoodDiary();
         foodDiary.setId(foodDiaryDto.getId());
+        foodDiary.setDate(foodDiaryDto.getDate());
         foodDiary.setTime(foodDiaryDto.getTime());
         foodDiary.setMenuName(foodDiaryDto.getMenuName());
         foodDiary.setPhotoUrl(foodDiaryDto.getPhotoUrl());

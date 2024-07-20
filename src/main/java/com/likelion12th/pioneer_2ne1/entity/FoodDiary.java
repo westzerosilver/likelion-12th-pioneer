@@ -19,6 +19,7 @@ public class FoodDiary {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private LocalDate date;
     private LocalTime time;
 
     private String menuName;
