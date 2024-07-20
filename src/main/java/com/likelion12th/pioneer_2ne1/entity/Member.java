@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
 @Entity
 @EntityListeners(value = {AutoCloseable.class})
 @Table(name="member")
-@Getter @Setter @ToString
+@Getter @Setter
+@ToString
 public class Member extends Base{
     @Id
     @Column(name = "member_id")
@@ -27,8 +28,9 @@ public class Member extends Base{
 
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+//    @Enumerated(EnumType.STRING)
+//    private Role role;
+    private String role;
 
     // provider : google이 들어감
     private String provider;
@@ -37,41 +39,48 @@ public class Member extends Base{
     private String providerId;
 
 
-    @Builder
-    public Member(String name, String email, Role role) {
-        this.name = name;
-        this.email = email;
-        this.role = role;
-    }
+//    @Builder
+//    public Member(String name, String email, Role role) {
+//        this.name = name;
+//        this.email = email;
+//        this.role = role;
+//    }
 
-    public Member() {
-        this.email = "";
-    }
+//    @Builder
+//    public Member(String name, String email, String role) {
+//        this.name = name;
+//        this.email = email;
+//        this.role = role;
+//    }
+//
+//    public Member() {
+//        this.email = "";
+//    }
+//
 
+//    public static Member createMember(MemberFormDto memberFormDto) {
+//        Member member = new Member();
+//        member.setEmail(memberFormDto.getEmail());
+//        member.setPassword(memberFormDto.getPassword());
+//        member.setRole("ROLE_USER");
+//
+//        return member;
+//    }
+//
+//    public static Member createMember(MemberFormDto memberFormDto, PasswordEncoder passwordEncoder){
+//        Member member = new Member();
+//        member.setEmail(memberFormDto.getEmail());
+//        String password = passwordEncoder.encode(memberFormDto.getPassword());
+//        member.setRole("ROLE_USER");
+//        member.setName(memberFormDto.getName());
+//        member.setPassword(password);
+//
+//        return member;
+//    }
 
-    public static Member createMember(MemberFormDto memberFormDto) {
-        Member member = new Member();
-        member.setEmail(memberFormDto.getEmail());
-        member.setPassword(memberFormDto.getPassword());
-        member.setRole(Role.USER);
-
-        return member;
-    }
-
-    public static Member createMember(MemberFormDto memberFormDto, PasswordEncoder passwordEncoder){
-        Member member = new Member();
-        member.setEmail(memberFormDto.getEmail());
-        String password = passwordEncoder.encode(memberFormDto.getPassword());
-        member.setRole(Role.USER);
-        member.setName(memberFormDto.getName());
-        member.setPassword(password);
-
-        return member;
-    }
-
-    public String getRoleKey() {
-        return this.role.getKey();
-    }
+//    public String getRoleKey() {
+//        return this.role.getKey();
+//    }
 
 
 

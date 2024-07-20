@@ -1,66 +1,86 @@
 package com.likelion12th.pioneer_2ne1.config;
 
+import com.likelion12th.pioneer_2ne1.jwt.JWTFilter;
+import com.likelion12th.pioneer_2ne1.jwt.JWTUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    //AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
+    private final AuthenticationConfiguration authenticationConfiguration;
+    //JWTUtil 주입
+    private final JWTUtil jwtUtil;
+
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil) {
+
+        this.authenticationConfiguration = authenticationConfiguration;
+        this.jwtUtil = jwtUtil;
+    }
+
+
+    //AuthenticationManager Bean 등록
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+
+        return configuration.getAuthenticationManager();
+    }
+
+
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        //csrf disable
         http
-                .formLogin(form -> form
-                        .loginPage("/members/login")
-                        .loginProcessingUrl("/members/login")
-                        .defaultSuccessUrl("/")
-                        .usernameParameter("email")
-                        .passwordParameter("password")
-                        .failureUrl("/members/login/error")
-                )
-                .logout(logout -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/members/logout"))
-                        .logoutSuccessUrl("/")
-                        .permitAll()
-                )
-                // OAuth2 로그인 기능에 대한 여러 설정
-                .oauth2Login(Customizer.withDefaults());
-//         http.csrf((csrf) -> csrf.disable());
+                .csrf((auth) -> auth.disable());
 
 
-
-        // 보안검사
+        //From 로그인 방식 disable
         http
-                .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/members/login").anonymous()
-                        .requestMatchers("/members/logout").authenticated()
-                        .requestMatchers("/members/mypage").authenticated()
-                        .requestMatchers("/members/delete").authenticated()
+                .formLogin((auth) -> auth.disable());
+
+
+        //http basic 인증 방식 disable
+        http
+                .httpBasic((auth) -> auth.disable());
+
+        //경로별 인가 작업
+        http
+                .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers("/login", "/", "/join").permitAll()
+                        .requestMatchers("/admin").hasRole("ADMIN")
+                        .requestMatchers("/members/**").hasRole("ADMIN")
                         .requestMatchers("/fooddiaries").authenticated()
-                        .requestMatchers("/fooddiaries/foodguide").authenticated()
-                        .requestMatchers("/foodcomplete").authenticated()
-                        .anyRequest().permitAll()
-                );
+                        .anyRequest().authenticated());
 
-        // 인증 실패시 대처 방법 커스텀
+        //JWTFilter 등록
         http
-                .exceptionHandling(error -> error
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                );
+                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 
 
+        http
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+
+        //세션 설정
+        http
+                .sessionManagement((session) -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
     }
