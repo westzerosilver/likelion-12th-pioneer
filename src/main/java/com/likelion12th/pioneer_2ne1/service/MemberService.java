@@ -1,6 +1,6 @@
 package com.likelion12th.pioneer_2ne1.service;
 
-import com.likelion12th.pioneer_2ne1.dto.MemberFormDto;
+import com.likelion12th.pioneer_2ne1.dto.JoinDTO;
 import com.likelion12th.pioneer_2ne1.entity.Member;
 import com.likelion12th.pioneer_2ne1.repository.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -13,11 +13,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
-
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class MemberService implements UserDetailsService {
+public class MemberService  {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -34,23 +33,7 @@ public class MemberService implements UserDetailsService {
         }
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Member member = memberRepository.findByEmail(email);
 
-        if(member == null) {
-            System.out.println("Not Found Member" );
-            System.out.println("memberEmail: " + email);
-            throw new UsernameNotFoundException(email);
-        }
-
-        System.out.println("Found member: " + member);
-
-        return User.builder()
-                .username(member.getEmail())
-                .password(member.getPassword())
-                .build();
-    }
 
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email);
@@ -61,7 +44,7 @@ public class MemberService implements UserDetailsService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member Id: " + id));
     }
 
-    public void updateMember(Long id, MemberFormDto memberFormDto, PasswordEncoder passwordEncoder) {
+    public void updateMember(Long id, JoinDTO memberFormDto, PasswordEncoder passwordEncoder) {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member Id: " + id));
         member.setName(memberFormDto.getName());
@@ -85,6 +68,7 @@ public class MemberService implements UserDetailsService {
 
         updateMember.setName(member.getName());
         updateMember.setEmail(member.getEmail());
+//        updateMember.setPassword(passwordEncoder.encode(member.getPassword()));
         updateMember.setPassword(member.getPassword());
 
         return memberRepository.save(updateMember);
@@ -96,7 +80,6 @@ public class MemberService implements UserDetailsService {
 
 
         if (deleteMember == null) {
-            System.out.println("-------------------- error --------------");
             throw new IllegalArgumentException("정보를 찾을 수 없습니다.");
         }
 

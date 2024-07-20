@@ -1,7 +1,6 @@
 package com.likelion12th.pioneer_2ne1.controller;
 
-import com.likelion12th.pioneer_2ne1.dto.LoginFormDto;
-import com.likelion12th.pioneer_2ne1.dto.MemberFormDto;
+import com.likelion12th.pioneer_2ne1.dto.JoinDTO;
 import com.likelion12th.pioneer_2ne1.entity.Member;
 import com.likelion12th.pioneer_2ne1.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,19 +10,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 @RequestMapping("/members")
 @Controller
@@ -32,124 +28,149 @@ public class MemberController {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private HttpServletRequest request;
 
-    @Autowired
-    private HttpServletResponse response;
+    @GetMapping("/mypage/{id}")
+    public ResponseEntity<JoinDTO> myPage(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-    @GetMapping(value = "/new")
-    public String memberForm(Model model){
-        model.addAttribute("memberFormDto", new MemberFormDto());
-        return "member/memberForm";
-    }
+        Member member = memberService.findById(id);
 
-    @PostMapping(value = "/new")
-    public String memberForm(@Valid MemberFormDto memberFormDto, BindingResult bindingResult, Model model){
-        if (bindingResult.hasErrors()){
-            return "member/memberForm";
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        if (!memberFormDto.isPasswordMatching()) {
-            model.addAttribute("errorMessage", "비밀번호가 일치하지 않습니다.");
-            return "member/memberForm";
+        if (!userDetails.getUsername().equals(member.getEmail())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
 
-        try {
-            Member member = Member.createMember(memberFormDto, passwordEncoder);
-            memberService.saveMember(member);
-        } catch (IllegalStateException e) {
-            System.out.println(e);
-            model.addAttribute("errorMessage", e.getMessage());
-            return "member/memberForm";
-        }
-
-        return "redirect:/";
-    }
-
-
-    @GetMapping("/login")
-    public String loginMember() {
-        return "/member/memberLoginForm";
-    }
-
-
-
-    @GetMapping("/login/error")
-    public String loginError(Model model) {
-        model.addAttribute("loginErrorMsg", "아이디 또는 비밀번호를 확인해주세요.");
-        return "/member/memberLoginForm";
-    }
-
-
-    @GetMapping("/mypage")
-    public String myPage(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        Member member = memberService.findByEmail(userDetails.getUsername());
-        model.addAttribute("member", member);
-        return "member/mypage";
-    }
-
-    @GetMapping("/update")
-    public String editMemberForm(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        Member member = memberService.findByEmail(userDetails.getUsername());
-        MemberFormDto memberFormDto = new MemberFormDto();
+        JoinDTO memberFormDto = new JoinDTO();
         memberFormDto.setEmail(member.getEmail());
         memberFormDto.setName(member.getName());
 
-        model.addAttribute("memberFormDto", memberFormDto);
-        return "member/updateMemberForm";
+        return ResponseEntity.ok(memberFormDto);
+    }
+
+
+    @GetMapping("/update/{id}")
+    public ResponseEntity<JoinDTO> updateMember(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Member member = memberService.findById(id);
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        if (!userDetails.getUsername().equals(member.getEmail())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        JoinDTO memberFormDto = new JoinDTO();
+        memberFormDto.setEmail(member.getEmail());
+        memberFormDto.setName(member.getName());
+
+        return ResponseEntity.ok(memberFormDto);
     }
 
 
 
-    @PostMapping("/update")
-    public String editMember(@Valid MemberFormDto memberFormDto, BindingResult bindingResult, Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        if (bindingResult.hasErrors()) {
-            return "member/updateMemberForm";
-        }
+//    @PutMapping("/update/{id}")
+//    public ResponseEntity<JoinDTO> updateMember(
+//            @PathVariable Long id,
+//            @RequestBody JoinDTO joinDTO,
+//            @AuthenticationPrincipal UserDetails userDetails) {
+//
+//        // 회원 조회
+//        Member member = memberService.findById(id);
+//        if (member == null) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+//        }
+//
+//        if (!userDetails.getUsername().equals(member.getEmail())) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+//        }
+//
+//        // 회원 정보 업데이트
+//        member.setName(joinDTO.getName());
+//        if (joinDTO.getPassword() != null && !joinDTO.getPassword().isEmpty()) {
+//            member.setPassword(passwordEncoder.encode(joinDTO.getPassword()));
+//        }
+//
+//        memberService.updateMember(member);
+//
+//        JoinDTO memberFormDto = new JoinDTO();
+//        memberFormDto.setEmail(member.getEmail());
+//        memberFormDto.setName(member.getName());
+//
+//        return ResponseEntity.ok(memberFormDto);
+//    }
 
-        if (!memberFormDto.isPasswordMatching()) {
-            model.addAttribute("errorMessage", "비밀번호가 일치하지 않습니다.");
-            return "member/updateMemberForm";
-        }
+//    @GetMapping("/delete")
+//    public String deleteMember() {
+//        return "member/delete";
+//    }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteMember(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
         try {
-            Member member = memberService.findByEmail(userDetails.getUsername());
-            member.setName(memberFormDto.getName());
-            if (!memberFormDto.getPassword().isEmpty()) {
-                member.setPassword(passwordEncoder.encode(memberFormDto.getPassword()));
+
+            // 회원 조회
+            Member member = memberService.findById(id);
+            if (member == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
-            memberService.updateMember(member);
 
-        } catch (IllegalStateException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "member/updateMemberForm";
-        }
-        return "redirect:/members/mypage";
-    }
+            if (!userDetails.getUsername().equals(member.getEmail())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            }
 
-    @GetMapping("/delete")
-    public String deleteMember() {
-        return "member/delete";
-    }
-
-    @PostMapping("/delete")
-    public String deleteMember(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        try {
             memberService.deleteMember(userDetails.getUsername());
 
-            // 로그아웃 처리
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null) {
-                new SecurityContextLogoutHandler().logout(request, response, auth);
-            }
+
+            return ResponseEntity.ok("delete ok");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("delete error");
         }
-        catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "member/delete";
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<JoinDTO> updateMember(
+            @PathVariable Long id,
+            @RequestBody JoinDTO updateRequest,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        // 회원 조회
+        Member member = memberService.findById(id);
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        return "redirect:/";
+        // 사용자 인증 확인 (선택 사항)
+        if (!userDetails.getUsername().equals(member.getEmail())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // 회원 정보 업데이트
+        member.setName(updateRequest.getName());
+        if (updateRequest.getPassword() != null && !updateRequest.getPassword().isEmpty()) {
+            // 비밀번호 암호화 후 저장
+            String encodedPassword = passwordEncoder.encode(updateRequest.getPassword());
+            member.setPassword(encodedPassword);
+        }
+
+        memberService.updateMember(member); // 업데이트된 회원 정보를 저장
+
+        // 업데이트된 정보 반환
+        JoinDTO memberFormDto = new JoinDTO();
+        memberFormDto.setEmail(member.getEmail());
+        memberFormDto.setName(member.getName());
+
+        return ResponseEntity.ok(memberFormDto);
     }
+
+
 
 }
