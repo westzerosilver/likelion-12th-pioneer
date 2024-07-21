@@ -28,8 +28,11 @@ public class JoinService {
 
         if (isExist) {
 
-            return;
+            throw new IllegalStateException("이미 가입된 회원입니다.");
         }
+//        else if (password == null || username == null || name == null) {
+//
+//        }
 
         Member data = new Member();
 

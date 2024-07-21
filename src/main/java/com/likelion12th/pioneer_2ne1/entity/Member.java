@@ -10,6 +10,8 @@ import lombok.ToString;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @EntityListeners(value = {AutoCloseable.class})
@@ -37,6 +39,11 @@ public class Member extends Base{
 
     // providerId : 구굴 로그인 한 유저의 고유 ID가 들어감
     private String providerId;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Compliment> complimentEntries = new ArrayList<>();
+
+    private int complimentCnt = 0;
 
 
 //    @Builder
@@ -67,16 +74,20 @@ public class Member extends Base{
 //        return member;
 //    }
 //
-//    public static Member createMember(MemberFormDto memberFormDto, PasswordEncoder passwordEncoder){
-//        Member member = new Member();
-//        member.setEmail(memberFormDto.getEmail());
-//        String password = passwordEncoder.encode(memberFormDto.getPassword());
-//        member.setRole("ROLE_USER");
-//        member.setName(memberFormDto.getName());
-//        member.setPassword(password);
-//
-//        return member;
-//    }
+    public static Member createMember(MemberFormDto memberFormDto, PasswordEncoder passwordEncoder){
+        Member member = new Member();
+        member.setEmail(memberFormDto.getEmail());
+        String password = passwordEncoder.encode(memberFormDto.getPassword());
+        member.setRole("ROLE_ADMIN");
+        member.setName(memberFormDto.getName());
+        member.setPassword(password);
+
+        return member;
+    }
+
+    public int addComplimentCnt() {
+        return this.complimentCnt++ ;
+    }
 
 //    public String getRoleKey() {
 //        return this.role.getKey();

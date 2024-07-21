@@ -63,10 +63,12 @@ public class SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login", "/", "/join").permitAll()
+                        .requestMatchers("/members/login", "/", "members/join", "/members/logout").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
-                        .requestMatchers("/members/**").hasRole("ADMIN")
+//                        .requestMatchers("/members/**").hasRole("ADMIN")
                         .requestMatchers("/fooddiaries").authenticated()
+                        .requestMatchers("/compliments/create").authenticated()
+                        .requestMatchers("/members/mypage/**").authenticated()
                         .anyRequest().authenticated());
 
         //JWTFilter 등록
@@ -77,10 +79,12 @@ public class SecurityConfig {
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
+
         //세션 설정
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
 
         return http.build();
     }
