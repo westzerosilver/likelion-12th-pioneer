@@ -1,6 +1,7 @@
 package com.likelion12th.pioneer_2ne1.service;
 
 import com.likelion12th.pioneer_2ne1.dto.JoinDTO;
+import com.likelion12th.pioneer_2ne1.dto.MemberFormDto;
 import com.likelion12th.pioneer_2ne1.entity.Member;
 import com.likelion12th.pioneer_2ne1.repository.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -9,16 +10,29 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
 @Service
 @Transactional
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class MemberService  {
     private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
+//    private final PasswordEncoder passwordEncoder;
+
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    public MemberService(MemberRepository memberRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+
+        this.memberRepository = memberRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
+
+
+
+
 
     // create member
     public Member saveMember(Member member) {
