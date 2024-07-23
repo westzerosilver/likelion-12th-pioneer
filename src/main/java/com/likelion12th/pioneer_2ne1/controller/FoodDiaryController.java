@@ -3,50 +3,51 @@ package com.likelion12th.pioneer_2ne1.controller;
 import com.likelion12th.pioneer_2ne1.dto.FoodDiaryDto;
 import com.likelion12th.pioneer_2ne1.service.FoodDiaryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/fooddiaries")
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/fooddiaries")
+@CrossOrigin(origins = "http://localhost:3000") // React 앱 주소
 public class FoodDiaryController {
+
     @Autowired
     private FoodDiaryService foodDiaryService;
 
     @GetMapping
-    public String getAllFoodDiaries(Model model) {
-        model.addAttribute("foodDiary", new FoodDiaryDto());
-        model.addAttribute("foodDiaries", foodDiaryService.getAllFoodDiaries());
-        return "fooddiary/fooddiaryPage";
+    public ResponseEntity<List<FoodDiaryDto>> getAllFoodDiaries() {
+        List<FoodDiaryDto> foodDiaries = foodDiaryService.getAllFoodDiaries();
+        return ResponseEntity.ok(foodDiaries);
     }
 
     @GetMapping("/{id}")
-    public String getFoodDiaryById(@PathVariable Long id, Model model) {
-        model.addAttribute("foodDiary", foodDiaryService.getFoodDiaryById(id));
-        return "fooddiary/fooddiaryPage";
+    public ResponseEntity<FoodDiaryDto> getFoodDiaryById(@PathVariable Long id) {
+        FoodDiaryDto foodDiaryDto = foodDiaryService.getFoodDiaryById(id);
+        if (foodDiaryDto != null) {
+            return ResponseEntity.ok(foodDiaryDto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
-    public String createFoodDiary(@ModelAttribute FoodDiaryDto foodDiaryDto) {
-        foodDiaryService.saveFoodDiary(foodDiaryDto);
-        return "redirect:/fooddiaries";
+    public ResponseEntity<FoodDiaryDto> createFoodDiary(@RequestBody FoodDiaryDto foodDiaryDto) {
+        FoodDiaryDto createdFoodDiary = foodDiaryService.saveFoodDiary(foodDiaryDto);
+        return ResponseEntity.ok(createdFoodDiary);
     }
 
     @PutMapping("/{id}")
-    public String updateFoodDiary(@PathVariable Long id, @ModelAttribute FoodDiaryDto foodDiaryDto) {
+    public ResponseEntity<FoodDiaryDto> updateFoodDiary(@PathVariable Long id, @RequestBody FoodDiaryDto foodDiaryDto) {
         foodDiaryDto.setId(id);
-        foodDiaryService.saveFoodDiary(foodDiaryDto);
-        return "redirect:/fooddiaries";
+        FoodDiaryDto updatedFoodDiary = foodDiaryService.saveFoodDiary(foodDiaryDto);
+        return ResponseEntity.ok(updatedFoodDiary);
     }
 
     @DeleteMapping("/{id}")
-    public String deleteFoodDiary(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteFoodDiary(@PathVariable Long id) {
         foodDiaryService.deleteFoodDiary(id);
-        return "redirect:/fooddiaries";
-    }
-
-    @GetMapping("/foodguide")
-    public String getFoodGuidePage() {
-        return "fooddiary/foodguidePage";
+        return ResponseEntity.noContent().build();
     }
 }

@@ -6,8 +6,6 @@ import com.likelion12th.pioneer_2ne1.repository.FoodCompleteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-
 @Service
 public class FoodCompleteService {
     @Autowired

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,6 +42,7 @@ public class FoodDiaryService {
         foodDiaryDto.setId(foodDiary.getId());
         foodDiaryDto.setDate(foodDiary.getDate());
         foodDiaryDto.setTime(foodDiary.getTime());
+        foodDiaryDto.setEatingType(foodDiary.getEatingType().name());
         foodDiaryDto.setMenuName(foodDiary.getMenuName());
         foodDiaryDto.setPhotoUrl(foodDiary.getPhotoUrl());
         foodDiaryDto.setEatingWith(foodDiary.getEatingWith().name());
@@ -54,6 +56,7 @@ public class FoodDiaryService {
         foodDiary.setId(foodDiaryDto.getId());
         foodDiary.setDate(foodDiaryDto.getDate());
         foodDiary.setTime(foodDiaryDto.getTime());
+        foodDiary.setEatingType(FoodDiary.EatingType.valueOf(foodDiaryDto.getEatingType()));
         foodDiary.setMenuName(foodDiaryDto.getMenuName());
         foodDiary.setPhotoUrl(foodDiaryDto.getPhotoUrl());
         foodDiary.setEatingWith(FoodDiary.EatingWith.valueOf(foodDiaryDto.getEatingWith()));
@@ -62,5 +65,3 @@ public class FoodDiaryService {
         return foodDiary;
     }
 }
-
-

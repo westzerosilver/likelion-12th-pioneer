@@ -22,6 +22,9 @@ public class FoodDiary {
     private LocalDate date;
     private LocalTime time;
 
+    @Enumerated(EnumType.STRING)
+    private EatingType eatingType;
+
     private String menuName;
 
     private String photoUrl;
@@ -35,6 +38,9 @@ public class FoodDiary {
     @Enumerated(EnumType.STRING)
     private Feeling feeling;
 
+    public enum EatingType {
+        BREAKFAST, LUNCH, DINNER, LATENIGHT, SNACK
+    }
 
     public enum EatingWith {
         ALONE, FRIEND, PARTNER, COLLEAGUE, OTHER
