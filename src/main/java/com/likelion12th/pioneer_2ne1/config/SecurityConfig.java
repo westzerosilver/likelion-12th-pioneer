@@ -66,7 +66,9 @@ public class SecurityConfig {
                         .requestMatchers("/members/login", "/", "members/join", "/members/logout").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
 //                        .requestMatchers("/members/**").hasRole("ADMIN")
-                        .requestMatchers("/fooddiaries").authenticated()
+                        .requestMatchers("/api/fooddiaries").authenticated()
+                        .requestMatchers("/api/foodcomplete").authenticated()
+                        .requestMatchers("/api/fooddiaries/detail").authenticated()
                         .requestMatchers("/compliments/create").authenticated()
                         .requestMatchers("/members/mypage/**").authenticated()
                         .anyRequest().authenticated());

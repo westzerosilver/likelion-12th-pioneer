@@ -9,7 +9,9 @@ import java.util.Set;
 @Getter
 @Setter
 public class FoodCompleteDto {
-    private FoodComplete.Feeling feeling;
-    private Set<FoodComplete.Symptom> symptoms;
+    private Long id;
+    private Long foodDiaryId;
+    private String afterfeeling;
+    private Set<String> symptoms;
     private String memo;
 }

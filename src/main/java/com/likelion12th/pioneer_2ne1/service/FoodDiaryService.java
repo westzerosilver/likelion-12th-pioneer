@@ -53,7 +53,6 @@ public class FoodDiaryService {
 
     private FoodDiary convertToEntity(FoodDiaryDto foodDiaryDto) {
         FoodDiary foodDiary = new FoodDiary();
-        foodDiary.setId(foodDiaryDto.getId());
         foodDiary.setDate(foodDiaryDto.getDate());
         foodDiary.setTime(foodDiaryDto.getTime());
         foodDiary.setEatingType(FoodDiary.EatingType.valueOf(foodDiaryDto.getEatingType()));

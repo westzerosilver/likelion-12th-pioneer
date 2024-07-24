@@ -21,6 +21,8 @@ public class FoodDiary {
 
     private LocalDate date;
     private LocalTime time;
+    private LocalTime startEatingTime;
+    private LocalTime endEatingTime;
 
     @Enumerated(EnumType.STRING)
     private EatingType eatingType;
@@ -37,6 +39,9 @@ public class FoodDiary {
 
     @Enumerated(EnumType.STRING)
     private Feeling feeling;
+
+    @OneToOne(mappedBy = "foodDiary", cascade = CascadeType.ALL)
+    private FoodComplete foodComplete;
 
     public enum EatingType {
         BREAKFAST, LUNCH, DINNER, LATENIGHT, SNACK
