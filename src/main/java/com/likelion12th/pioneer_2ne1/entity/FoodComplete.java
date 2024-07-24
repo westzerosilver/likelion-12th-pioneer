@@ -19,7 +19,7 @@ public class FoodComplete {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private Feeling feeling;
+    private Afterfeeling afterfeeling;
 
     @ElementCollection(targetClass = Symptom.class)
     @CollectionTable(name = "food_complete_symptom", joinColumns = @JoinColumn(name = "food_complete_id"))
@@ -28,7 +28,11 @@ public class FoodComplete {
 
     private String memo;
 
-    public enum Feeling {
+    @OneToOne
+    @JoinColumn(name = "food_diary_id")
+    private FoodDiary foodDiary;
+
+    public enum Afterfeeling {
         COMFORTABLE, HAPPY, EASY, GUILT, IRRITATE, ANXIOUS, LONELY
     }
 

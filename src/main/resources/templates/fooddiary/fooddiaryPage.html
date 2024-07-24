@@ -61,6 +61,10 @@
 <body>
 <form th:action="@{/fooddiaries}" th:object="${foodDiary}" method="post" enctype="multipart/form-data">
     <div>
+        <label>날짜</label>
+        <input type="date" th:field="*{date}" />
+    </div>
+    <div>
         <label>시간</label>
         <div class="time-control">
             <input type="time" id="time" th:field="*{time}" />

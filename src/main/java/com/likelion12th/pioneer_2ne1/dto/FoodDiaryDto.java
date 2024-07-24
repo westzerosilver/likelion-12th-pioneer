@@ -10,7 +10,9 @@ import java.time.LocalTime;
 @Setter
 public class FoodDiaryDto {
     private Long id;
+    private LocalDate date;
     private LocalTime time;
+    private String eatingType;
     private String menuName;
     private String photoUrl;
     private String eatingWith;
@@ -25,12 +27,28 @@ public class FoodDiaryDto {
         this.id = id;
     }
 
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
     public LocalTime getTime() {
         return time;
     }
 
     public void setTime(LocalTime time) {
         this.time = time;
+    }
+
+    public String getEatingType() {
+        return eatingType;
+    }
+
+    public void setEatingType(String eatingType) {
+        this.eatingType = eatingType;
     }
 
     public String getMenuName() {
