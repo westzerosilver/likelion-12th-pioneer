@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,17 +36,19 @@ public class Member extends Base{
     private String role;
 
     // provider : google이 들어감
-    private String provider;
+//    private String provider;
 
     // providerId : 구굴 로그인 한 유저의 고유 ID가 들어감
-    private String providerId;
+//    private String providerId;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Compliment> complimentEntries = new ArrayList<>();
 
     private int complimentCnt = 0;
 
-    @OneToMany(mappedBy = "member")
+    private LocalDate complementDate;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FoodDiary> foodDiaries;
 
 

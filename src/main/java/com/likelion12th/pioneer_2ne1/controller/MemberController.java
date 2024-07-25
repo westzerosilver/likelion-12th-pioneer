@@ -1,8 +1,6 @@
 package com.likelion12th.pioneer_2ne1.controller;
 
-import com.likelion12th.pioneer_2ne1.dto.JoinDTO;
-import com.likelion12th.pioneer_2ne1.dto.LoginDto;
-import com.likelion12th.pioneer_2ne1.dto.MemberFormDto;
+import com.likelion12th.pioneer_2ne1.dto.*;
 import com.likelion12th.pioneer_2ne1.entity.Member;
 import com.likelion12th.pioneer_2ne1.jwt.JWTUtil;
 import com.likelion12th.pioneer_2ne1.jwt.JwtResponse;
@@ -50,6 +48,7 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Passwords do not match");
         }
         try {
+
             Member member = Member.createMember(memberFormDto, passwordEncoder);
             memberService.saveMember(member);
         } catch (IllegalStateException e) {
@@ -91,41 +90,32 @@ public class MemberController {
 
 
 
-    @GetMapping("/mypage/{id}")
-    public ResponseEntity<JoinDTO> myPage(
-            @PathVariable Long id,
+    @GetMapping("/mypage")
+    public ResponseEntity<?> myPage(
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        Member member = memberService.findById(id);
+        try{
+            Mypage mypage = memberService.getMypage(userDetails.getUsername());
 
-        if (member == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.ok(mypage);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-
-        if (!userDetails.getUsername().equals(member.getEmail())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        }
-
-        JoinDTO memberFormDto = new JoinDTO();
-        memberFormDto.setEmail(member.getEmail());
-        memberFormDto.setName(member.getName());
-
-        return ResponseEntity.ok(memberFormDto);
     }
 
 
     @GetMapping("/update/{id}")
-    public ResponseEntity<JoinDTO> updateMember(
+    public ResponseEntity<?> updateMember(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
 
         Member member = memberService.findById(id);
         if (member == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("member == null");
         }
 
         if (!userDetails.getUsername().equals(member.getEmail())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("!userDetails.getUsername().equals(member.getEmail())");
         }
 
         JoinDTO memberFormDto = new JoinDTO();
@@ -175,43 +165,37 @@ public class MemberController {
         return ResponseEntity.ok(member);
     }
 
+    @PutMapping("/updatePassword")
+    public ResponseEntity<?> updatePassword(
+            @Valid @RequestBody PasswordDto passwordDto,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        // 회원 조회
+        Member member = memberService.findByEmail(userDetails.getUsername());
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        // 사용자 인증 확인 (선택 사항)
+        if (!userDetails.getUsername().equals(member.getEmail())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingResult.getAllErrors());
+        }
+
+        try {
+            memberService.updatePassword(member, passwordDto, passwordEncoder);
+            return ResponseEntity.ok("password update success");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+
+    }
 
 
-//    @PutMapping("/update/{id}")
-//    public ResponseEntity<JoinDTO> updateMember(
-//            @PathVariable Long id,
-//            @RequestBody JoinDTO joinDTO,
-//            @AuthenticationPrincipal UserDetails userDetails) {
-//
-//        // 회원 조회
-//        Member member = memberService.findById(id);
-//        if (member == null) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//        }
-//
-//        if (!userDetails.getUsername().equals(member.getEmail())) {
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-//        }
-//
-//        // 회원 정보 업데이트
-//        member.setName(joinDTO.getName());
-//        if (joinDTO.getPassword() != null && !joinDTO.getPassword().isEmpty()) {
-//            member.setPassword(passwordEncoder.encode(joinDTO.getPassword()));
-//        }
-//
-//        memberService.updateMember(member);
-//
-//        JoinDTO memberFormDto = new JoinDTO();
-//        memberFormDto.setEmail(member.getEmail());
-//        memberFormDto.setName(member.getName());
-//
-//        return ResponseEntity.ok(memberFormDto);
-//    }
-
-//    @GetMapping("/delete")
-//    public String deleteMember() {
-//        return "member/delete";
-//    }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteMember(

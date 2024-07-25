@@ -48,6 +48,7 @@ public class Compliment {
         Compliment compliment = new Compliment();
 
         member.addComplimentCnt();
+        member.setComplementDate(LocalDate.now());
         compliment.setMember(member);
 
         compliment.setCompliment1(complimentReqDto.getCompliment1());

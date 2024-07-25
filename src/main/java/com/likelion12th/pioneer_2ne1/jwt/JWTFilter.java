@@ -3,6 +3,7 @@ package com.likelion12th.pioneer_2ne1.jwt;
 import com.likelion12th.pioneer_2ne1.entity.Member;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,9 +29,24 @@ public class JWTFilter extends OncePerRequestFilter {
 
         String authorization= request.getHeader("Authorization");
 
+        if (authorization == null ) {
+            Cookie[] cookies = request.getCookies();
+            for (Cookie cookie : cookies) {
+
+                System.out.println(cookie.getName());
+                if (cookie.getName().equals("Authorization")) {
+
+                    authorization = cookie.getValue();
+                }
+            }
+        }
+
+
+
+
         if (authorization == null || !authorization.startsWith("Bearer ")) {
 
-            System.out.println("token null");
+            System.out.println("JWTFilter: token null");
             filterChain.doFilter(request, response);
 
             return;
@@ -61,7 +77,7 @@ public class JWTFilter extends OncePerRequestFilter {
         userEntity.setRole(role);
 
         CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
-        System.out.println("userEntity: " + userEntity);
+        System.out.println("JWTFilter/ userEntity: " + userEntity);
 
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);

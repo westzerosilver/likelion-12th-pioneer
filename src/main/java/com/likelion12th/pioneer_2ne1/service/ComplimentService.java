@@ -42,4 +42,18 @@ public class ComplimentService {
 
         complimentRepository.save(compliment);
     }
+
+    public void createNewCompliment( String email) {
+        System.out.println("ComplimentService email: " + email);
+        Member member = memberRepository.findByEmail(email);
+
+        if (member == null) {
+            throw new IllegalArgumentException("회원이 존재하지 않음");
+        }
+
+        member.setComplementDate(LocalDate.now());
+        member.addComplimentCnt();
+
+        memberRepository.save(member);
+    }
 }

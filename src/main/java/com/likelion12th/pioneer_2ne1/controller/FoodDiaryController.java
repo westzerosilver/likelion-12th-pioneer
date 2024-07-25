@@ -4,6 +4,8 @@ import com.likelion12th.pioneer_2ne1.dto.FoodDiaryDto;
 import com.likelion12th.pioneer_2ne1.service.FoodDiaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,9 +34,16 @@ public class FoodDiaryController {
         }
     }
 
+//    @PostMapping("/{date}")
+//    public ResponseEntity<FoodDiaryDto> createFoodDiary(@RequestBody FoodDiaryDto foodDiaryDto) {
+//        FoodDiaryDto createdFoodDiary = foodDiaryService.saveFoodDiary(foodDiaryDto);
+//        return ResponseEntity.ok(createdFoodDiary);
+//    }
+
     @PostMapping("/{date}")
-    public ResponseEntity<FoodDiaryDto> createFoodDiary(@RequestBody FoodDiaryDto foodDiaryDto) {
-        FoodDiaryDto createdFoodDiary = foodDiaryService.saveFoodDiary(foodDiaryDto);
+    public ResponseEntity<FoodDiaryDto> createFoodDiary(@RequestBody FoodDiaryDto foodDiaryDto,
+                                                        @AuthenticationPrincipal UserDetails userDetails) {
+        FoodDiaryDto createdFoodDiary = foodDiaryService.saveFoodDiary(foodDiaryDto, userDetails.getUsername());
         return ResponseEntity.ok(createdFoodDiary);
     }
 

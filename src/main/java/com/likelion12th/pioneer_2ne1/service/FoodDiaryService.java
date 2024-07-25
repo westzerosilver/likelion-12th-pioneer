@@ -43,6 +43,21 @@ public class FoodDiaryService {
         return convertToDto(savedFoodDiary);
     }
 
+    public FoodDiaryDto saveFoodDiary(FoodDiaryDto foodDiaryDto, String email) {
+
+        Member member = memberRepository.findByEmail(email);
+        if (member == null) {
+            throw new IllegalArgumentException("회원 정보를 찾을 수 없습니다.");
+        }
+
+
+        FoodDiary foodDiary = convertToEntity(foodDiaryDto);
+        foodDiary.setMember(member);
+        FoodDiary savedFoodDiary = foodDiaryRepository.save(foodDiary);
+        return convertToDto(savedFoodDiary);
+    }
+
+
     public void deleteFoodDiary(Long id) {
         foodDiaryRepository.deleteById(id);
     }
