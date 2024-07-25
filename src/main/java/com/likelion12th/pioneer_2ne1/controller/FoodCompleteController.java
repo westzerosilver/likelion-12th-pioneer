@@ -14,7 +14,7 @@ public class FoodCompleteController {
     @Autowired
     private FoodCompleteService foodCompleteService;
 
-    @PostMapping
+    @PostMapping("/{date}")
     public ResponseEntity<Void> submitFoodComplete(@RequestBody FoodCompleteDto foodCompleteDto) {
         foodCompleteService.saveFoodComplete(foodCompleteDto);
         return ResponseEntity.ok().build();

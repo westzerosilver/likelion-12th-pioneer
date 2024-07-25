@@ -1,5 +1,6 @@
 package com.likelion12th.pioneer_2ne1.dto;
 
+import com.likelion12th.pioneer_2ne1.entity.Member;
 import lombok.Getter;
 import lombok.Setter;
 
