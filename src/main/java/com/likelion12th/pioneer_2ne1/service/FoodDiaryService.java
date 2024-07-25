@@ -1,8 +1,11 @@
 package com.likelion12th.pioneer_2ne1.service;
 
+import com.likelion12th.pioneer_2ne1.config.SecurityUtil;
 import com.likelion12th.pioneer_2ne1.dto.FoodDiaryDto;
 import com.likelion12th.pioneer_2ne1.entity.FoodDiary;
+import com.likelion12th.pioneer_2ne1.entity.Member;
 import com.likelion12th.pioneer_2ne1.repository.FoodDiaryRepository;
+import com.likelion12th.pioneer_2ne1.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +19,21 @@ public class FoodDiaryService {
     @Autowired
     private FoodDiaryRepository foodDiaryRepository;
 
-    public List<FoodDiaryDto> getAllFoodDiaries() {
-        return foodDiaryRepository.findAll().stream()
+    @Autowired
+    private MemberRepository memberRepository;
+
+    public List<FoodDiaryDto> getAllFoodDiariesForCurrentUser() {
+        String membername = SecurityUtil.getCurrentUsername();
+        Member currentMember = memberRepository.findByEmail(membername);
+        return foodDiaryRepository.findAllByMember(currentMember).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    public FoodDiaryDto getFoodDiaryById(Long id) {
-        Optional<FoodDiary> foodDiary = foodDiaryRepository.findById(id);
+    public FoodDiaryDto getFoodDiaryByIdForCurrentUser(Long id) {
+        String membername = SecurityUtil.getCurrentUsername();
+        Member currentUser = memberRepository.findByEmail(membername);
+        Optional<FoodDiary> foodDiary = foodDiaryRepository.findByIdAndMember(id, currentUser);
         return foodDiary.map(this::convertToDto).orElse(null);
     }
 

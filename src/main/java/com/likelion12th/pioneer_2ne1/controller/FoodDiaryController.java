@@ -18,13 +18,13 @@ public class FoodDiaryController {
 
     @GetMapping
     public ResponseEntity<List<FoodDiaryDto>> getAllFoodDiaries() {
-        List<FoodDiaryDto> foodDiaries = foodDiaryService.getAllFoodDiaries();
+        List<FoodDiaryDto> foodDiaries = foodDiaryService.getAllFoodDiariesForCurrentUser();
         return ResponseEntity.ok(foodDiaries);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<FoodDiaryDto> getFoodDiaryById(@PathVariable Long id) {
-        FoodDiaryDto foodDiaryDto = foodDiaryService.getFoodDiaryById(id);
+        FoodDiaryDto foodDiaryDto = foodDiaryService.getFoodDiaryByIdForCurrentUser(id);
         if (foodDiaryDto != null) {
             return ResponseEntity.ok(foodDiaryDto);
         } else {
@@ -32,7 +32,7 @@ public class FoodDiaryController {
         }
     }
 
-    @PostMapping
+    @PostMapping("/{date}")
     public ResponseEntity<FoodDiaryDto> createFoodDiary(@RequestBody FoodDiaryDto foodDiaryDto) {
         FoodDiaryDto createdFoodDiary = foodDiaryService.saveFoodDiary(foodDiaryDto);
         return ResponseEntity.ok(createdFoodDiary);

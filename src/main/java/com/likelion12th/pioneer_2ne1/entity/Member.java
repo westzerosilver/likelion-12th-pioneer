@@ -45,6 +45,9 @@ public class Member extends Base{
 
     private int complimentCnt = 0;
 
+    @OneToMany(mappedBy = "member")
+    private List<FoodDiary> foodDiaries;
+
 
 //    @Builder
 //    public Member(String name, String email, Role role) {
