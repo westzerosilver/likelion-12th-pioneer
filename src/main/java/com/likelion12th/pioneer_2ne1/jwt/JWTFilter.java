@@ -43,7 +43,6 @@ public class JWTFilter extends OncePerRequestFilter {
 
 
 
-
         if (authorization == null || !authorization.startsWith("Bearer ")) {
 
             System.out.println("JWTFilter: token null");
@@ -55,16 +54,27 @@ public class JWTFilter extends OncePerRequestFilter {
         System.out.println("authorization now");
         String token = authorization.split(" ")[1];
         //토큰 소멸 시간 검증
-        if (jwtUtil.isExpired(token)) {
+        try {
 
-            System.out.println("token expired");
-            filterChain.doFilter(request, response);
 
+            if (jwtUtil.isExpired(token)) {
+
+                System.out.println("token expired");
+
+                //            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "다시 로그인해주세요");
+
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                filterChain.doFilter(request, response);
+
+                return;
+            } else {
+                String username = jwtUtil.getUsername(token);
+                System.out.println("JWT Token is valid. Username: " + username);
+            }
+        } catch (Exception e) {
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
-        }
-        else{
-            String username = jwtUtil.getUsername(token);
-            System.out.println("JWT Token is valid. Username: " + username);
         }
 
 
