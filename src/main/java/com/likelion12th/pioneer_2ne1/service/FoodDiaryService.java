@@ -7,8 +7,12 @@ import com.likelion12th.pioneer_2ne1.entity.Member;
 import com.likelion12th.pioneer_2ne1.repository.FoodDiaryRepository;
 import com.likelion12th.pioneer_2ne1.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -30,13 +34,12 @@ public class FoodDiaryService {
                 .collect(Collectors.toList());
     }
 
-    public FoodDiaryDto getFoodDiaryByIdForCurrentUser(Long id) {
-        String membername = SecurityUtil.getCurrentUsername();
-        Member currentUser = memberRepository.findByEmail(membername);
-        Optional<FoodDiary> foodDiary = foodDiaryRepository.findByIdAndMember(id, currentUser);
-        return foodDiary.map(this::convertToDto).orElse(null);
+    public List<FoodDiaryDto> getFoodDiariesByDateForCurrentUser(LocalDate date) {
+        // 현재 로그인된 사용자와 날짜에 따라 식사 일기 목록을 조회
+        return foodDiaryRepository.findByDateAndMember(date, getCurrentUser()).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
-
     public FoodDiaryDto saveFoodDiary(FoodDiaryDto foodDiaryDto) {
         FoodDiary foodDiary = convertToEntity(foodDiaryDto);
         FoodDiary savedFoodDiary = foodDiaryRepository.save(foodDiary);
@@ -61,6 +64,31 @@ public class FoodDiaryService {
     public void deleteFoodDiary(Long id) {
         foodDiaryRepository.deleteById(id);
     }
+
+    private Member getCurrentUser() {
+        // SecurityContext에서 현재 인증 정보 가져옴
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // 인증 정보가 있고 사용자 정보가 UserDetails 타입일 때 처리
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            // 현재 로그인한 사용자 이름 얻음
+            String username = ((UserDetails) authentication.getPrincipal()).getUsername();
+
+            // 사용자 이메일로 Member 찾음
+            Member member = memberRepository.findByEmail(username);
+
+            // Member가 null인 경우 예외
+            if (member != null) {
+                return member;
+            } else {
+                throw new RuntimeException("User not found with email: " + username);
+            }
+        }
+
+        // 인증 정보가 없거나 사용자 정보가 UserDetails 타입이 아닌 경우 예외
+        throw new RuntimeException("User not authenticated");
+    }
+
 
     private FoodDiaryDto convertToDto(FoodDiary foodDiary) {
         FoodDiaryDto foodDiaryDto = new FoodDiaryDto();

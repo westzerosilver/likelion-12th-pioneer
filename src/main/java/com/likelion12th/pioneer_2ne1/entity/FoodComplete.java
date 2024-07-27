@@ -18,6 +18,10 @@ public class FoodComplete {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     @Enumerated(EnumType.STRING)
     private Afterfeeling afterfeeling;
 
@@ -32,11 +36,28 @@ public class FoodComplete {
     @JoinColumn(name = "food_diary_id")
     private FoodDiary foodDiary;
 
-    public enum Afterfeeling {
-        COMFORTABLE, HAPPY, EASY, GUILT, IRRITATE, ANXIOUS, LONELY
-    }
-
     public enum Symptom {
         VOMIT, MEDICINE, BINGE, REDUCE, SPIT, DIETMEDICINE, EXERCISE, OTHER, NOTHING
     }
+
+    public enum Afterfeeling {
+        COMFORTABLE(6),
+        HAPPY(7),
+        EASY(5),
+        GUILT(1),
+        IRRITATE(3),
+        ANXIOUS(2),
+        LONELY(4);
+
+        private final int score;
+
+        Afterfeeling(int score) {
+            this.score = score;
+        }
+
+        public int getScore() {
+            return score;
+        }
+    }
+
 }

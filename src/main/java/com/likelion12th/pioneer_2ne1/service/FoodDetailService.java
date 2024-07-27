@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
-import java.util.Arrays;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -23,25 +23,26 @@ public class FoodDetailService {
     @Autowired
     private FoodCompleteRepository foodCompleteRepository;
 
-    public FoodDetailDto getFoodDiaryDetailById(Long id) {
-        Optional<FoodDiary> foodDiary = foodDiaryRepository.findById(id);
-        Optional<FoodComplete> foodComplete = foodCompleteRepository.findById(id);
-
-        if (foodDiary.isPresent() && foodComplete.isPresent()) {
-            return convertToDetailDto(foodDiary.get(), foodComplete.get());
+    public FoodDetailDto getFoodDiaryDetailById(LocalDate date, Long id) {
+        Optional<FoodDiary> foodDiary = foodDiaryRepository.findByIdAndDate(id, date);
+        if (foodDiary.isPresent()) {
+            Optional<FoodComplete> foodComplete = foodCompleteRepository.findById(id);
+            if (foodComplete.isPresent()) {
+                return convertToDetailDto(foodDiary.get(), foodComplete.get());
+            }
         }
         return null;
     }
 
-    public FoodDetailDto updateFoodDiary(Long id, FoodDetailDto foodDetailDto) {
-        Optional<FoodDiary> optionalFoodDiary = foodDiaryRepository.findById(id);
+    public FoodDetailDto updateFoodDiary(LocalDate date, Long id, FoodDetailDto foodDetailDto) {
+        Optional<FoodDiary> optionalFoodDiary = foodDiaryRepository.findByIdAndDate(id, date);
         Optional<FoodComplete> optionalFoodComplete = foodCompleteRepository.findById(id);
 
         if (optionalFoodDiary.isPresent() && optionalFoodComplete.isPresent()) {
             FoodDiary foodDiary = optionalFoodDiary.get();
             FoodComplete foodComplete = optionalFoodComplete.get();
 
-            foodDiary.setDate(foodDetailDto.getDate());
+            foodDiary.setDate(date);
             foodDiary.setStartEatingTime(parseTime(foodDetailDto.getStartEatingTime()));
             foodDiary.setEndEatingTime(parseTime(foodDetailDto.getEndEatingTime()));
             foodDiary.setMenuName(foodDetailDto.getMenuName());
@@ -62,9 +63,16 @@ public class FoodDetailService {
         return null;
     }
 
-    public void deleteFoodDiary(Long id) {
-        foodDiaryRepository.deleteById(id);
-        foodCompleteRepository.deleteById(id);
+    public boolean deleteFoodDiary(LocalDate date, Long id) {
+        Optional<FoodDiary> optionalFoodDiary = foodDiaryRepository.findByIdAndDate(id, date);
+        Optional<FoodComplete> optionalFoodComplete = foodCompleteRepository.findById(id);
+
+        if (optionalFoodDiary.isPresent() && optionalFoodComplete.isPresent()) {
+            foodDiaryRepository.deleteById(id);
+            foodCompleteRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
     private FoodDetailDto convertToDetailDto(FoodDiary foodDiary, FoodComplete foodComplete) {
@@ -90,7 +98,8 @@ public class FoodDetailService {
             foodDetailDto.setSymptoms(foodComplete.getSymptoms().stream()
                     .map(FoodComplete.Symptom::name)
                     .collect(Collectors.toSet()));
-        }foodDetailDto.setMemo(foodComplete.getMemo());
+        }
+        foodDetailDto.setMemo(foodComplete.getMemo());
 
         return foodDetailDto;
     }
