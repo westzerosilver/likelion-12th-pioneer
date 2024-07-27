@@ -22,4 +22,5 @@ public class FoodDetailDto {
     private String afterFeeling;
     private Set<String> symptoms;
     private String memo;
+
 }

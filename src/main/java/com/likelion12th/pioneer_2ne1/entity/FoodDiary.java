@@ -45,7 +45,7 @@ public class FoodDiary {
     private Feeling feeling;
 
 
-    @OneToOne(mappedBy = "foodDiary", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "foodDiary", cascade = CascadeType.ALL, orphanRemoval = true)
     private FoodComplete foodComplete;
 
     public Member getMember() {
@@ -73,4 +73,3 @@ public class FoodDiary {
     }
 
 }
-

@@ -13,5 +13,9 @@ public interface FoodDiaryRepository extends JpaRepository<FoodDiary, Long> {
     List<FoodDiary> findAllByMember(Member member);
     Optional<FoodDiary> findByIdAndMember(Long id, Member member);
     List<FoodDiary> findByMemberIdAndDateBetween(Long memberId, LocalDate startDate, LocalDate endDate);
+
+    List<FoodDiary> findByDateAndMember(LocalDate date, Member user);
     void deleteByIdAndMember(Long id, Member member);
+    Optional<FoodDiary> findByIdAndDate(Long id, LocalDate date);
 }
+
