@@ -104,19 +104,14 @@ public class MemberController {
     }
 
 
-    @GetMapping("/update/{id}")
-    public ResponseEntity<?> updateMember(
-            @PathVariable Long id,
-            @AuthenticationPrincipal UserDetails userDetails) {
+    @GetMapping("/update")
+    public ResponseEntity<?> updateMember(@AuthenticationPrincipal UserDetails userDetails) {
 
-        Member member = memberService.findById(id);
+        Member member = memberService.findByEmail(userDetails.getUsername());
         if (member == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("member == null");
         }
 
-        if (!userDetails.getUsername().equals(member.getEmail())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("!userDetails.getUsername().equals(member.getEmail())");
-        }
 
         JoinDTO memberFormDto = new JoinDTO();
         memberFormDto.setEmail(member.getEmail());
@@ -125,15 +120,14 @@ public class MemberController {
         return ResponseEntity.ok(memberFormDto);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/update")
     public ResponseEntity<?> updateMember(
-            @PathVariable Long id,
             @Valid @RequestBody MemberFormDto memberFormDto,
             BindingResult bindingResult,
             @AuthenticationPrincipal UserDetails userDetails) {
 
         // 회원 조회
-        Member member = memberService.findById(id);
+        Member member = memberService.findByEmail(userDetails.getUsername());
         if (member == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
@@ -165,8 +159,24 @@ public class MemberController {
         return ResponseEntity.ok(member);
     }
 
+    @PostMapping("/checkPassword")
+    public ResponseEntity<?> checkPassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody CheckPasswordDto checkPasswordDto)
+    {
+        try {
+            memberService.checkPassword(userDetails.getUsername(), checkPasswordDto, passwordEncoder);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+        return ResponseEntity.ok("");
+    }
+
     @PutMapping("/updatePassword")
     public ResponseEntity<?> updatePassword(
+            HttpServletRequest request, HttpServletResponse response,
             @Valid @RequestBody PasswordDto passwordDto,
             BindingResult bindingResult,
             @AuthenticationPrincipal UserDetails userDetails) {
@@ -177,17 +187,20 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        // 사용자 인증 확인 (선택 사항)
-        if (!userDetails.getUsername().equals(member.getEmail())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        }
-
         if (bindingResult.hasErrors()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingResult.getAllErrors());
         }
 
         try {
             memberService.updatePassword(member, passwordDto, passwordEncoder);
+
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+            // 로그아웃 처리
+            if (auth != null) {
+                new SecurityContextLogoutHandler().logout(request, response, auth);
+            }
+
             return ResponseEntity.ok("password update success");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -197,14 +210,12 @@ public class MemberController {
 
 
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteMember(
-            @PathVariable Long id,
-            @AuthenticationPrincipal UserDetails userDetails) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteMember(@AuthenticationPrincipal UserDetails userDetails) {
         try {
 
             // 회원 조회
-            Member member = memberService.findById(id);
+            Member member = memberService.findByEmail(userDetails.getUsername());
             if (member == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }

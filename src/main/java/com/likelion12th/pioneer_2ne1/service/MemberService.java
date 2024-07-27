@@ -1,9 +1,6 @@
 package com.likelion12th.pioneer_2ne1.service;
 
-import com.likelion12th.pioneer_2ne1.dto.JoinDTO;
-import com.likelion12th.pioneer_2ne1.dto.MemberFormDto;
-import com.likelion12th.pioneer_2ne1.dto.Mypage;
-import com.likelion12th.pioneer_2ne1.dto.PasswordDto;
+import com.likelion12th.pioneer_2ne1.dto.*;
 import com.likelion12th.pioneer_2ne1.entity.DateUtils;
 import com.likelion12th.pioneer_2ne1.entity.FoodComplete;
 import com.likelion12th.pioneer_2ne1.entity.FoodDiary;
@@ -23,12 +20,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.IllegalFormatException;
-import java.util.Map;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -69,6 +66,16 @@ public class MemberService  {
         if (member1 != null) {
             throw new IllegalStateException("이미 가입된 회원입니다");
         }
+    }
+
+    private Member findMember(String email) {
+        Member member= memberRepository.findByEmail(email);
+
+        if (member == null) {
+            throw new IllegalArgumentException("정보를 찾을 수 없습니다.");
+        }
+
+        return member;
     }
 
 
@@ -140,20 +147,17 @@ public class MemberService  {
         memberRepository.delete(deleteMember);
     }
 
-//    public Mypage mypage(String email) {
-//        Member member = findByEmail(email);
-//
-//        if (member == null) {
-//            throw new IllegalArgumentException("정보를 찾을 수 없습니다.");
-//        }
-//
-//        Mypage mypage = new Mypage();
-//        foodCompleteRepository
-//
-//
-//        mypage.setName(member.getName());
-//
-//    }
+    public void checkPassword(String email, CheckPasswordDto checkPasswordDto, PasswordEncoder passwordEncoder) {
+        Member member = memberRepository.findByEmail(email);
+        if (member == null) {
+            throw new IllegalArgumentException("정보를 찾을 수 없습니다.");
+        }
+
+        if (!passwordEncoder.matches(checkPasswordDto.getOldPassword(), member.getPassword())) {
+            throw new  IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+    }
 
 
     public Mypage getMypage(String username) {
@@ -168,19 +172,27 @@ public class MemberService  {
         LocalDate startOfWeek = DateUtils.getStartOfWeek();
         LocalDate endOfWeek = DateUtils.getEndOfWeek();
 
+        long daysSinceJoined = member.daysSinceJoined() + 1;
+
         // 일주일간의 Feeling 항목별 갯수 계산
-        System.out.println("calculateWeeklyFeelingCounts");
         Map<FoodDiary.Feeling, Long> weeklyFeelingCounts = calculateWeeklyFeelingCounts(memberId, startOfWeek, endOfWeek);
 
         Map<FoodDiary.EatingType, Long> weeklyEatingTypeCounts = calculateweeklyEatingTypeCounts(memberId, startOfWeek, endOfWeek);
 
         // 일주일간의 증상 항목별 갯수 계산
-        System.out.println("calculateWeeklySymptomCounts");
         Map<FoodComplete.Symptom, Long> weeklySymptomCounts = calculateWeeklySymptomCounts(memberId, startOfWeek, endOfWeek );
 
         // 요일별 증상의 전체 갯수 계산
-        System.out.println("calculateDailySymptomCounts");
         Map<String, Long> dailySymptomCounts = calculateDailySymptomCounts(memberId, startOfWeek, endOfWeek );
+
+
+        // 폭식 증상 시 통계
+        List<FoodDiary> diaries = getDiariesWithBingeSymptom(memberId);
+        Map<FoodDiary.EatingType, Long> bingeEatingTypeCounts = getBingeEatingTypeCounts(diaries);
+        LocalTime averageBingeEatingTime = getAverageBingeEatingTime(diaries);
+        Map<FoodDiary.Feeling, Long> top3BingeFeelings = getTop3BingeFeelings(diaries);
+        Map<FoodComplete.Afterfeeling, Long> top3BingeAfterFeelings = getTop3BingeAfterFeelings(diaries);
+
 
         Mypage mypage = new Mypage();
         mypage.setName(member.getName());
@@ -192,10 +204,36 @@ public class MemberService  {
         mypage.setWeeklyFeelingCounts(weeklyFeelingCounts);
         mypage.setWeeklySymptomCounts(weeklySymptomCounts);
         mypage.setDailySymptomCounts(dailySymptomCounts);
+        mypage.setBingeEatingTypeCounts(bingeEatingTypeCounts);
+        mypage.setAverageBingeEatingTime(averageBingeEatingTime);
+        mypage.setTop3BingeFeelings(top3BingeFeelings);
+        mypage.setTop3BingeAfterFeelings(top3BingeAfterFeelings);
+        mypage.setDaysSinceJoined(daysSinceJoined);
+        mypage.setTotalFoodDiaryCount(getTotalFoodDiaryCount(memberId));
+
+        FoodDiary highestScoreDiary = getHighestScoreAfterfeelingDiary(memberId); // 가장 높은 점수를 가진 식사 조회
+
+
+        // 가장 높은 Afterfeeling 점수를 가진 식사 정보 설정
+        if (highestScoreDiary != null) {
+            mypage.setHighestScoreAfterfeelingEatingType(highestScoreDiary.getEatingType());
+            mypage.setHighestScoreAfterfeelingEatingWith(highestScoreDiary.getEatingWith());
+            mypage.setHighestScoreAfterfeelingEatingWhere(highestScoreDiary.getEatingWhere());
+            mypage.setHighestScoreAfterfeelingMenuName(highestScoreDiary.getMenuName());
+            mypage.setHighestScoreAfterfeeling(highestScoreDiary.getFoodComplete().getAfterfeeling());
+        }
+
+
 
         return mypage;
     }
 
+    public Long getTotalFoodDiaryCount(Long memberId) {
+        System.out.println("getTotalFoodDiaryCount");
+        return foodDiaryRepository.countByMemberId(memberId);
+    }
+
+    //ok
     private Map<FoodDiary.Feeling, Long> calculateWeeklyFeelingCounts(Long memberId, LocalDate startOfWeek, LocalDate endOfWeek ) {
 
         Map<FoodDiary.Feeling, Long> feelingCounts = new EnumMap<>(FoodDiary.Feeling.class);
@@ -207,9 +245,8 @@ public class MemberService  {
 
         return feelingCounts;
     }
-
+//ok
     private Map<FoodDiary.EatingType, Long> calculateweeklyEatingTypeCounts(Long memberId, LocalDate startOfWeek, LocalDate endOfWeek ) {
-
 
         Map<FoodDiary.EatingType, Long> eatingTypeCounts = new HashMap<>();
 
@@ -220,7 +257,7 @@ public class MemberService  {
 
         return eatingTypeCounts;
     }
-
+//ok
     private Map<FoodComplete.Symptom, Long> calculateWeeklySymptomCounts(Long memberId, LocalDate startOfWeek, LocalDate endOfWeek ) {
 
         Map<FoodComplete.Symptom, Long> symptomCounts = new EnumMap<>(FoodComplete.Symptom.class);
@@ -236,22 +273,104 @@ public class MemberService  {
 
         return symptomCounts;
     }
-
+//ok
     private Map<String, Long> calculateDailySymptomCounts(Long memberId, LocalDate startOfWeek, LocalDate endOfWeek ) {
-
 
         Map<String, Long> dailyCounts = new HashMap<>();
 
         foodDiaryRepository.findByMemberIdAndDateBetween(memberId, startOfWeek, endOfWeek).forEach(diary -> {
             FoodComplete foodComplete = diary.getFoodComplete();
             if (foodComplete != null) {
-                LocalDate date = LocalDate.from(diary.getTime());
+                LocalDate date = LocalDate.from(diary.getDate());
                 String dayOfWeek = date.getDayOfWeek().name();
                 dailyCounts.put(dayOfWeek, dailyCounts.getOrDefault(dayOfWeek, 0L) + foodComplete.getSymptoms().size());
             }
         });
 
         return dailyCounts;
+    }
+
+    public List<FoodDiary> getDiariesWithBingeSymptom(Long memberId) {
+        // BINGE 증상을 가진 FoodComplete 조회
+        List<FoodComplete> foodCompletes = foodCompleteRepository.findFoodCompleteBySymptoms(FoodComplete.Symptom.BINGE);
+
+        // FoodDiary 리스트를 조회하기 위한 FoodComplete ID 리스트 생성
+        List<Long> foodDiaryIds = foodCompletes.stream()
+                .map(FoodComplete::getFoodDiary) // FoodDiary 가져오기
+                .map(FoodDiary::getId) // FoodDiary ID 추출
+                .collect(Collectors.toList());
+
+        // FoodDiary 리스트 조회
+        List<FoodDiary> diaries = foodDiaryRepository.findAllById(foodDiaryIds);
+
+        return diaries;
+    }
+
+
+    public Map<FoodDiary.EatingType, Long> getBingeEatingTypeCounts(List<FoodDiary> diaries) {
+        System.out.println("getBingeEatingTypeCounts---------------" + diaries);
+        return diaries.stream()
+                .collect(Collectors.groupingBy(FoodDiary::getEatingType, Collectors.counting()));
+
+    }
+    public LocalTime getAverageBingeEatingTime(List<FoodDiary> diaries) {
+        // 식사 시간 저장할 리스트
+        List<LocalTime> eatingTimes = new ArrayList<>();
+
+        // BINGE 증상이 있는 FoodComplete 객체에서 관련된 식사 일기의 시간을 수집
+        for (FoodDiary foodDiary : diaries) {
+            LocalTime eatingTime = foodDiary.getTime();
+            if (eatingTime != null) {
+                eatingTimes.add(eatingTime);
+            }
+
+        }
+        System.out.println("eatingTimes: " + eatingTimes);
+
+        // 수집한 시간이 없는 경우 null 반환
+        if (eatingTimes.isEmpty()) {
+            return null;
+        }
+
+        // 평균 시간 계산
+        long totalSeconds = eatingTimes.stream()
+                .mapToLong(LocalTime::toSecondOfDay) // 시간을 초로 변환
+                .sum();
+
+        long averageSeconds = totalSeconds / eatingTimes.size(); // 평균 초 계산
+        return LocalTime.ofSecondOfDay(averageSeconds); // 평균 시간을 LocalTime으로 반환
+    }
+
+    public Map<FoodDiary.Feeling, Long> getTop3BingeFeelings(List<FoodDiary> diaries ){
+        return diaries.stream()
+                .collect(Collectors.groupingBy(FoodDiary::getFeeling, Collectors.counting()))
+                .entrySet().stream()
+                .sorted(Map.Entry.<FoodDiary.Feeling, Long>comparingByValue().reversed())
+                .limit(3)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    public Map<FoodComplete.Afterfeeling, Long> getTop3BingeAfterFeelings(List<FoodDiary> diaries) {
+        System.out.println("getTop3BingeAfterFeelings---------------" + diaries);
+        return diaries.stream()
+                .filter(diary -> diary.getFoodComplete() != null)
+                .collect(Collectors.groupingBy(diary -> diary.getFoodComplete().getAfterfeeling(), Collectors.counting()))
+                .entrySet().stream()
+                .sorted(Map.Entry.<FoodComplete.Afterfeeling, Long>comparingByValue().reversed())
+                .limit(3)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    // 가장 높은 Afterfeeling 점수를 가진 식사 조회
+    public FoodDiary getHighestScoreAfterfeelingDiary(Long memberId) {
+        System.out.println("getHighestScoreAfterfeelingDiary");
+        List<FoodDiary> diaries = foodDiaryRepository.findByMemberId(memberId);
+
+        System.out.println("getHighestScoreAfterfeelingDiary");
+        return diaries.stream()
+                .filter(diary -> diary.getFoodComplete() != null) // FoodComplete가 있는 경우만 필터링
+                .max(Comparator.comparingInt(diary -> diary.getFoodComplete().getAfterfeeling().getScore())) // Afterfeeling 점수로 최대값 찾기
+                .orElse(null); // 없을 경우 null 반환
     }
 
 

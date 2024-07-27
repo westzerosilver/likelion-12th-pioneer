@@ -8,6 +8,7 @@ import com.likelion12th.pioneer_2ne1.repository.FoodDiaryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ public class FoodCompleteService {
 
     @Autowired
     private FoodDiaryRepository foodDiaryRepository;
+
 
     public void saveFoodComplete(FoodCompleteDto foodCompleteDto) {
         FoodComplete foodComplete = new FoodComplete();

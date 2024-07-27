@@ -18,7 +18,6 @@ import java.util.List;
 @EntityListeners(value = {AutoCloseable.class})
 @Table(name="member")
 @Getter @Setter
-@ToString
 public class Member extends Base{
     @Id
     @Column(name = "member_id")
@@ -52,34 +51,6 @@ public class Member extends Base{
     private List<FoodDiary> foodDiaries;
 
 
-//    @Builder
-//    public Member(String name, String email, Role role) {
-//        this.name = name;
-//        this.email = email;
-//        this.role = role;
-//    }
-
-//    @Builder
-//    public Member(String name, String email, String role) {
-//        this.name = name;
-//        this.email = email;
-//        this.role = role;
-//    }
-//
-//    public Member() {
-//        this.email = "";
-//    }
-//
-
-//    public static Member createMember(MemberFormDto memberFormDto) {
-//        Member member = new Member();
-//        member.setEmail(memberFormDto.getEmail());
-//        member.setPassword(memberFormDto.getPassword());
-//        member.setRole("ROLE_USER");
-//
-//        return member;
-//    }
-//
     public static Member createMember(MemberFormDto memberFormDto, PasswordEncoder passwordEncoder){
         Member member = new Member();
         member.setEmail(memberFormDto.getEmail());
@@ -95,10 +66,9 @@ public class Member extends Base{
         return this.complimentCnt++ ;
     }
 
-//    public String getRoleKey() {
-//        return this.role.getKey();
-//    }
-
-
+    // 가입일로부터 경과된 일수 계산
+    public long daysSinceJoined() {
+        return LocalDateTime.now().toLocalDate().toEpochDay() - this.getRegTime().toLocalDate().toEpochDay();
+    }
 
 }
