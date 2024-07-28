@@ -14,4 +14,14 @@ public class CorsMvcConfig implements WebMvcConfigurer {
                 .exposedHeaders("Set-Cookie")
                 .allowedOrigins("http://localhost:3000");
     }
+
+//    @Override
+//    public void addCorsMappings(CorsRegistry corsRegistry) {
+//        corsRegistry.addMapping("/**")
+//                .allowedOrigins("*")  // 모든 도메인 허용
+//                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+//                .allowedHeaders("*")
+//                .exposedHeaders("Set-Cookie")
+//                .allowCredentials(true).maxAge(3600);
+//    }
 }

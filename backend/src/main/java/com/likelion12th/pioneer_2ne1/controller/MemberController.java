@@ -24,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequestMapping("/members")
 @Controller
@@ -36,6 +37,12 @@ public class MemberController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private JWTUtil jwtUtil;
+
+
+    @GetMapping(value = "/join")
+    public ResponseEntity<?> getJoin() {
+        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+    }
 
 
     @PostMapping(value="/join")
@@ -172,6 +179,33 @@ public class MemberController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
         return ResponseEntity.ok("");
+    }
+
+    @GetMapping("/updateProfile")
+    public ResponseEntity<?> updateProfile(@AuthenticationPrincipal UserDetails userDetails) {
+        ProfileDto profileDto = new ProfileDto();
+        try{
+            Member member = memberService.findByEmail(userDetails.getUsername());
+
+            profileDto.setName(member.getName());
+            profileDto.setProfileImgPath(member.getProfileImgPath());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+
+        return ResponseEntity.ok(profileDto);
+    }
+
+    @PatchMapping("/updateProfile")
+    public ResponseEntity<?> updateProfile(@RequestPart(name = "profileDto", required = false) ProfileDto profileDto,
+                                           @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+                                           @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            memberService.updateProfile(userDetails.getUsername(), profileDto, profileImage);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+        return ResponseEntity.ok("update profile success");
     }
 
     @PutMapping("/updatePassword")

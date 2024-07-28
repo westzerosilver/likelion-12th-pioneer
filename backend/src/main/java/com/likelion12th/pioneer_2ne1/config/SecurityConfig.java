@@ -90,6 +90,8 @@ public class SecurityConfig {
         }));
 
 
+
+
         //From 로그인 방식 disable
         http
                 .formLogin((auth) -> auth.disable());
@@ -111,7 +113,7 @@ public class SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/members/login", "/", "/members/join", "/members/logout").permitAll()
+                        .requestMatchers("/members/login", "/", "/members/join", "/members/logout", "/api/hello").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
 //                        .requestMatchers("/members/**").hasRole("ADMIN")
                         .requestMatchers("/api/fooddiaries").authenticated()

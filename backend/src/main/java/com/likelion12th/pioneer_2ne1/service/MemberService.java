@@ -10,6 +10,7 @@ import com.likelion12th.pioneer_2ne1.repository.FoodDiaryRepository;
 import com.likelion12th.pioneer_2ne1.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
@@ -19,7 +20,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -132,6 +136,34 @@ public class MemberService  {
 
         updateMember.setPassword(passwordEncoder.encode(passwordDto.getPassword()));
         memberRepository.save(updateMember);
+
+    }
+
+    @Value("${uploadPath}")
+    private String uploadPath;
+    public void updateProfile(String email, ProfileDto profileDto, MultipartFile profileImg) throws IOException {
+        Member member = memberRepository.findByEmail(email);
+
+        if (member == null) {
+            throw new IllegalArgumentException("정보를 찾을 수 없습니다.");
+        }
+
+        if (!member.getName().equals( profileDto.getName())) {
+            member.setName(profileDto.getName());
+        }
+
+        if(profileImg != null) {
+            UUID uuid = UUID.randomUUID();
+            String fileName = uuid.toString() + "_" + profileImg.getOriginalFilename();
+            File itemImgFile = new File(uploadPath, fileName);
+            profileImg.transferTo(itemImgFile);
+            member.setProfileImg(fileName);
+            member.setProfileImgPath(uploadPath+ "/" + fileName);
+
+        }
+
+        memberRepository.save(member);
+
 
     }
 

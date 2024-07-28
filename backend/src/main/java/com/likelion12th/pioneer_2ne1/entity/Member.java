@@ -30,6 +30,9 @@ public class Member extends Base{
 
     private String name;
 
+    private  String profileImg;
+    private String profileImgPath;
+
 //    @Enumerated(EnumType.STRING)
 //    private Role role;
     private String role;
