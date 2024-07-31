@@ -32,19 +32,22 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
     private final CustomOAuth2AuthenticationFailureHandler customOAuth2AuthenticationFailureHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
 
     public SecurityConfig(AuthenticationConfiguration authenticationConfiguration,
                           JWTUtil jwtUtil,
                           CustomOAuth2UserService customOAuth2UserService,
                           CustomSuccessHandler customSuccessHandler,
-                          CustomOAuth2AuthenticationFailureHandler customOAuth2AuthenticationFailureHandler) {
+                          CustomOAuth2AuthenticationFailureHandler customOAuth2AuthenticationFailureHandler,
+                          CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
 
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
         this.customOAuth2UserService = customOAuth2UserService;
         this.customSuccessHandler = customSuccessHandler;
         this.customOAuth2AuthenticationFailureHandler = customOAuth2AuthenticationFailureHandler;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
     }
 
 
@@ -113,13 +116,16 @@ public class SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/members/login", "/", "/members/join", "/members/logout", "/api/hello").permitAll()
+                        .requestMatchers("/members/login", "/", "/members/join", "/members/logout").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
 //                        .requestMatchers("/members/**").hasRole("ADMIN")
                         .requestMatchers("/api/fooddiaries").authenticated()
                         .requestMatchers("/api/foodcomplete").authenticated()
                         .requestMatchers("/api/fooddiaries/detail").authenticated()
                         .requestMatchers("/compliments/create").authenticated()
+                        .requestMatchers("/members/updatePassword").authenticated()
+                        .requestMatchers("/members/updateProfile").authenticated()
+                        .requestMatchers("/members/mypage").authenticated()
                         .anyRequest().authenticated());
 
         //JWTFilter 등록
@@ -136,6 +142,11 @@ public class SecurityConfig {
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        // CustomAuthenticationEntryPoint 등록
+        http
+                .exceptionHandling((exceptions) -> exceptions
+                        .authenticationEntryPoint(customAuthenticationEntryPoint));
 
 
         return http.build();
