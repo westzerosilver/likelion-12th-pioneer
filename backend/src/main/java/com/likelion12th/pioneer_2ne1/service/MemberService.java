@@ -56,6 +56,14 @@ public class MemberService  {
     }
 
 
+    public MainDto getMain(String email) {
+        Member member = findMember(email);
+
+        MainDto mainDto = new MainDto();
+        mainDto.setName(member.getName());
+
+        return mainDto;
+    }
 
 
 
