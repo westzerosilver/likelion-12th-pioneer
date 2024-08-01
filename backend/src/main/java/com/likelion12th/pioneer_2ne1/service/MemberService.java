@@ -227,6 +227,7 @@ public class MemberService  {
 
 
         Mypage mypage = new Mypage();
+        mypage.setProfileImgPath(member.getProfileImgPath());
         mypage.setName(member.getName());
         mypage.setComplementDate(member.getComplementDate());
         mypage.setStartOfWeek(startOfWeek);
