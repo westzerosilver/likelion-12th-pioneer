@@ -14,6 +14,7 @@ public class CustomOAuth2AuthenticationFailureHandler implements AuthenticationF
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException {
-        response.sendRedirect("members/login");
+//        response.sendRedirect("members/login");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 }

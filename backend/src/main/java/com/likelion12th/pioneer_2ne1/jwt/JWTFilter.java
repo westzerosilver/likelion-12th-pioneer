@@ -27,6 +27,20 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+
+        String requestUri = request.getRequestURI();
+
+        if (requestUri.matches("^\\/members\\/login(?:\\/.*)?$")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        if (requestUri.matches("^\\/oauth2(?:\\/.*)?$")) {
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+
         String authorization= request.getHeader("Authorization");
 
 
@@ -44,7 +58,7 @@ public class JWTFilter extends OncePerRequestFilter {
             }
         } catch (Exception e) {
             System.out.println("JWTFilter cookies null error");
-            System.out.println(e.getMessage());
+            System.out.println("JWTFilter cookies error: " + e.getMessage());
         }
 
 
