@@ -92,4 +92,3 @@ public class FoodDiaryDto {
         this.feeling = feeling;
     }
 }
-

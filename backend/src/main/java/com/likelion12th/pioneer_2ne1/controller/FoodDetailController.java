@@ -17,7 +17,7 @@ public class FoodDetailController {
     private FoodDetailService foodDetailService;
 
     @GetMapping("/{date}/{id}")
-    public ResponseEntity<FoodDetailDto> getFoodDiaryDetailById(@PathVariable Long id,
+    public ResponseEntity<FoodDetailDto> getFoodDiaryDetailById(@PathVariable("id") Long id,
                                                                 @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         FoodDetailDto foodDetailDto = foodDetailService.getFoodDiaryDetailById(date, id);
         if (foodDetailDto != null) {
@@ -28,7 +28,7 @@ public class FoodDetailController {
     }
 
     @PutMapping("/{date}/{id}")
-    public ResponseEntity<FoodDetailDto> updateFoodDiary(@PathVariable Long id,
+    public ResponseEntity<FoodDetailDto> updateFoodDiary(@PathVariable("id") Long id,
                                                          @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                                                          @RequestBody FoodDetailDto foodDetailDto) {
         FoodDetailDto updatedFoodDiary = foodDetailService.updateFoodDiary(date, id, foodDetailDto);
@@ -36,7 +36,7 @@ public class FoodDetailController {
     }
 
     @DeleteMapping("/{date}/{id}")
-    public ResponseEntity<Void> deleteFoodDiary(@PathVariable Long id,
+    public ResponseEntity<Void> deleteFoodDiary(@PathVariable("id") Long id,
                                                 @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         foodDetailService.deleteFoodDiary(date, id);
         return ResponseEntity.noContent().build();

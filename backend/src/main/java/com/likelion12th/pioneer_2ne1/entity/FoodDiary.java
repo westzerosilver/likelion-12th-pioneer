@@ -33,6 +33,7 @@ public class FoodDiary {
     private String menuName;
 
     private String photoUrl;
+    private String photoUrlPath;
 
     @Enumerated(EnumType.STRING)
     private EatingWith eatingWith;

@@ -7,15 +7,18 @@ import com.likelion12th.pioneer_2ne1.entity.Member;
 import com.likelion12th.pioneer_2ne1.repository.FoodDiaryRepository;
 import com.likelion12th.pioneer_2ne1.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +28,9 @@ public class FoodDiaryService {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Value("${uploadPath}")
+    private String uploadPath;
 
     public List<FoodDiaryDto> getAllFoodDiariesForCurrentUser() {
         String membername = SecurityUtil.getCurrentUsername();
@@ -40,26 +46,24 @@ public class FoodDiaryService {
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
-    public FoodDiaryDto saveFoodDiary(FoodDiaryDto foodDiaryDto) {
-        FoodDiary foodDiary = convertToEntity(foodDiaryDto);
-        FoodDiary savedFoodDiary = foodDiaryRepository.save(foodDiary);
-        return convertToDto(savedFoodDiary);
-    }
 
-    public FoodDiaryDto saveFoodDiary(FoodDiaryDto foodDiaryDto, String email) {
-
+    public FoodDiaryDto saveFoodDiary(FoodDiaryDto foodDiaryDto, String email, MultipartFile photoFile) {
         Member member = memberRepository.findByEmail(email);
         if (member == null) {
             throw new IllegalArgumentException("회원 정보를 찾을 수 없습니다.");
         }
 
+        FoodDiary foodDiary;
+        try {
+            foodDiary = convertToEntity(foodDiaryDto, photoFile);
+        } catch (IOException e) {
+            throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
+        }
 
-        FoodDiary foodDiary = convertToEntity(foodDiaryDto);
         foodDiary.setMember(member);
         FoodDiary savedFoodDiary = foodDiaryRepository.save(foodDiary);
         return convertToDto(savedFoodDiary);
     }
-
 
     public void deleteFoodDiary(Long id) {
         foodDiaryRepository.deleteById(id);
@@ -89,7 +93,6 @@ public class FoodDiaryService {
         throw new RuntimeException("User not authenticated");
     }
 
-
     private FoodDiaryDto convertToDto(FoodDiary foodDiary) {
         FoodDiaryDto foodDiaryDto = new FoodDiaryDto();
         foodDiaryDto.setId(foodDiary.getId());
@@ -104,13 +107,22 @@ public class FoodDiaryService {
         return foodDiaryDto;
     }
 
-    private FoodDiary convertToEntity(FoodDiaryDto foodDiaryDto) {
+    private FoodDiary convertToEntity(FoodDiaryDto foodDiaryDto, MultipartFile photoFile) throws IOException {
         FoodDiary foodDiary = new FoodDiary();
         foodDiary.setDate(foodDiaryDto.getDate());
         foodDiary.setTime(foodDiaryDto.getTime());
         foodDiary.setEatingType(FoodDiary.EatingType.valueOf(foodDiaryDto.getEatingType()));
         foodDiary.setMenuName(foodDiaryDto.getMenuName());
-        foodDiary.setPhotoUrl(foodDiaryDto.getPhotoUrl());
+
+        if (photoFile != null && !photoFile.isEmpty()) {
+            UUID uuid = UUID.randomUUID();
+            String fileName = uuid.toString() + "_" + photoFile.getOriginalFilename();
+            File itemImgFile = new File(uploadPath, fileName);
+            photoFile.transferTo(itemImgFile);
+            foodDiary.setPhotoUrl(fileName);
+            foodDiary.setPhotoUrlPath(uploadPath + "/" + fileName);
+        }
+
         foodDiary.setEatingWith(FoodDiary.EatingWith.valueOf(foodDiaryDto.getEatingWith()));
         foodDiary.setEatingWhere(FoodDiary.EatingWhere.valueOf(foodDiaryDto.getEatingWhere()));
         foodDiary.setFeeling(FoodDiary.Feeling.valueOf(foodDiaryDto.getFeeling()));
