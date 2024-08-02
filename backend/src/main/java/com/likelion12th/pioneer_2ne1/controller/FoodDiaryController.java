@@ -8,7 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -32,27 +34,14 @@ public class FoodDiaryController {
         return ResponseEntity.ok(foodDiaries);
     }
 
-
-//    @PostMapping("/{date}")
-//    public ResponseEntity<FoodDiaryDto> createFoodDiary(@RequestBody FoodDiaryDto foodDiaryDto) {
-//        FoodDiaryDto createdFoodDiary = foodDiaryService.saveFoodDiary(foodDiaryDto);
-//        return ResponseEntity.ok(createdFoodDiary);
-//    }
-
     @PostMapping("/{date}")
-    public ResponseEntity<FoodDiaryDto> createFoodDiary(@RequestBody FoodDiaryDto foodDiaryDto,
+    public ResponseEntity<FoodDiaryDto> createFoodDiary(@RequestPart(name = "foodDiaryDto") FoodDiaryDto foodDiaryDto,
+                                                        @RequestPart(value = "photoFile", required = false) MultipartFile photoFile,
                                                         @AuthenticationPrincipal UserDetails userDetails,
-                                                        @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+                                                        @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) throws IOException {
         foodDiaryDto.setDate(date); // 날짜 설정
-        FoodDiaryDto createdFoodDiary = foodDiaryService.saveFoodDiary(foodDiaryDto, userDetails.getUsername());
+        FoodDiaryDto createdFoodDiary = foodDiaryService.saveFoodDiary(foodDiaryDto, userDetails.getUsername(), photoFile);
         return ResponseEntity.ok(createdFoodDiary);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<FoodDiaryDto> updateFoodDiary(@PathVariable Long id, @RequestBody FoodDiaryDto foodDiaryDto) {
-        foodDiaryDto.setId(id);
-        FoodDiaryDto updatedFoodDiary = foodDiaryService.saveFoodDiary(foodDiaryDto);
-        return ResponseEntity.ok(updatedFoodDiary);
     }
 
     @DeleteMapping("/{id}")
