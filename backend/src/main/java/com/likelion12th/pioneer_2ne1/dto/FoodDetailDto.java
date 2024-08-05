@@ -12,10 +12,13 @@ import java.util.Set;
 public class FoodDetailDto {
     private Long id;
     private LocalDate date;
+    private String eatingType;
     private String menuName;
     private String photoUrl;
     private String eatingWith;
+    private String eatingWithOther;
     private String eatingWhere;
+    private String eatingWhereOther;
     private String feeling;
     private String startEatingTime;
     private String endEatingTime;

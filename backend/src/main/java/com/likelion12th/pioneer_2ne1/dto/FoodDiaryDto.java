@@ -17,7 +17,9 @@ public class FoodDiaryDto {
     private String menuName;
     private String photoUrl;
     private String eatingWith;
+    private String eatingWithOther;
     private String eatingWhere;
+    private String eatingWhereOther;
     private String feeling;
 
     public Long getId() {

@@ -45,10 +45,13 @@ public class FoodDetailService {
             foodDiary.setDate(date);
             foodDiary.setStartEatingTime(parseTime(foodDetailDto.getStartEatingTime()));
             foodDiary.setEndEatingTime(parseTime(foodDetailDto.getEndEatingTime()));
+            foodDiary.setEatingType(FoodDiary.EatingType.valueOf(foodDetailDto.getEatingType()));
             foodDiary.setMenuName(foodDetailDto.getMenuName());
             foodDiary.setPhotoUrl(foodDetailDto.getPhotoUrl());
             foodDiary.setEatingWith(FoodDiary.EatingWith.valueOf(foodDetailDto.getEatingWith()));
+            foodDiary.setEatingWithOther(foodDetailDto.getEatingWithOther());
             foodDiary.setEatingWhere(FoodDiary.EatingWhere.valueOf(foodDetailDto.getEatingWhere()));
+            foodDiary.setEatingWhereOther(foodDiary.getEatingWhereOther());
             foodDiary.setFeeling(FoodDiary.Feeling.valueOf(foodDetailDto.getFeeling()));
 
             foodComplete.setAfterfeeling(FoodComplete.Afterfeeling.valueOf(foodDetailDto.getAfterFeeling()));
@@ -79,10 +82,13 @@ public class FoodDetailService {
         FoodDetailDto foodDetailDto = new FoodDetailDto();
         foodDetailDto.setId(foodDiary.getId());
         foodDetailDto.setDate(foodDiary.getDate());
+        foodDetailDto.setEatingType(foodDiary.getEatingType().name());
         foodDetailDto.setMenuName(foodDiary.getMenuName());
         foodDetailDto.setPhotoUrl(foodDiary.getPhotoUrl());
         foodDetailDto.setEatingWith(foodDiary.getEatingWith().name());
+        foodDetailDto.setEatingWithOther(foodDiary.getEatingWithOther());
         foodDetailDto.setEatingWhere(foodDiary.getEatingWhere().name());
+        foodDetailDto.setEatingWhereOther(foodDiary.getEatingWhereOther());
         foodDetailDto.setFeeling(foodDiary.getFeeling().name());
 
         if (foodDiary.getStartEatingTime() != null) {

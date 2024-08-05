@@ -38,8 +38,12 @@ public class FoodDiary {
     @Enumerated(EnumType.STRING)
     private EatingWith eatingWith;
 
+    private String eatingWithOther;
+
     @Enumerated(EnumType.STRING)
     private EatingWhere eatingWhere;
+
+    private String eatingWhereOther;
 
     @Enumerated(EnumType.STRING)
     private Feeling feeling;
@@ -61,7 +65,7 @@ public class FoodDiary {
     }
 
     public enum EatingWith {
-        ALONE, FRIEND, PARTNER, COLLEAGUE, OTHER
+        ALONE, FRIEND, FAMILY, PARTNER, COLLEAGUE, OTHER
     }
 
     public enum EatingWhere {

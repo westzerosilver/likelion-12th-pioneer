@@ -102,7 +102,9 @@ public class FoodDiaryService {
         foodDiaryDto.setMenuName(foodDiary.getMenuName());
         foodDiaryDto.setPhotoUrl(foodDiary.getPhotoUrl());
         foodDiaryDto.setEatingWith(foodDiary.getEatingWith().name());
+        foodDiaryDto.setEatingWithOther(foodDiary.getEatingWithOther());
         foodDiaryDto.setEatingWhere(foodDiary.getEatingWhere().name());
+        foodDiaryDto.setEatingWhereOther(foodDiary.getEatingWhereOther());
         foodDiaryDto.setFeeling(foodDiary.getFeeling().name());
         return foodDiaryDto;
     }
@@ -124,7 +126,9 @@ public class FoodDiaryService {
         }
 
         foodDiary.setEatingWith(FoodDiary.EatingWith.valueOf(foodDiaryDto.getEatingWith()));
+        foodDiary.setEatingWithOther(foodDiaryDto.getEatingWithOther());
         foodDiary.setEatingWhere(FoodDiary.EatingWhere.valueOf(foodDiaryDto.getEatingWhere()));
+        foodDiary.setEatingWhereOther(foodDiaryDto.getEatingWhereOther());
         foodDiary.setFeeling(FoodDiary.Feeling.valueOf(foodDiaryDto.getFeeling()));
         return foodDiary;
     }
