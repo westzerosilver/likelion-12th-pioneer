@@ -20,7 +20,8 @@ public class CorsMvcConfig implements WebMvcConfigurer {
                 .exposedHeaders(HttpHeaders.LOCATION)
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","))
                 .allowCredentials(true).maxAge(3600)
-                .allowedOrigins("http://localhost:3000");
+//                .allowedOrigins("http://localhost:3000");
+                .allowedOrigins("http://3.37.81.68");
     }
 
 //    @Override
