@@ -116,16 +116,16 @@ public class SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/members/login", "/", "/members/join", "/members/logout").permitAll()
+                        .requestMatchers("/api/members/login", "/", "/api/members/join", "/api/members/logout").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
 //                        .requestMatchers("/members/**").hasRole("ADMIN")
-                        .requestMatchers("/api/fooddiaries").authenticated()
-                        .requestMatchers("/api/foodcomplete").authenticated()
-                        .requestMatchers("/api/fooddiaries/detail").authenticated()
-                        .requestMatchers("/compliments/create").authenticated()
-                        .requestMatchers("/members/updatePassword").authenticated()
-                        .requestMatchers("/members/updateProfile").authenticated()
-                        .requestMatchers("/members/mypage").authenticated()
+                        .requestMatchers("/api/fooddiaries/**").authenticated()
+                        .requestMatchers("/api/foodcomplete/**").authenticated()
+                        .requestMatchers("/api/fooddiaries/detail/**").authenticated()
+                        .requestMatchers("/api/compliments/create").authenticated()
+                        .requestMatchers("/api/members/updatePassword").authenticated()
+                        .requestMatchers("/api/members/updateProfile").authenticated()
+                        .requestMatchers("/api/members/mypage").authenticated()
                         .anyRequest().authenticated());
 
         //JWTFilter 등록

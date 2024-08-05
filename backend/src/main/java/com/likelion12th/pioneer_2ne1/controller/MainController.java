@@ -20,7 +20,7 @@ public class MainController {
     @Autowired
     private MemberService memberService;
 
-    @GetMapping(value = "/main")
+    @GetMapping(value = "/api/main")
     public ResponseEntity<?> main(@AuthenticationPrincipal UserDetails userDetails) {
         try{
             MainDto mainDto = memberService.getMain(userDetails.getUsername());

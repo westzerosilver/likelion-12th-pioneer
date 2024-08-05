@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@RequestMapping("/compliments")
+@RequestMapping("/api/compliments")
 @Controller
 @RequiredArgsConstructor
 public class ComplimentController {
