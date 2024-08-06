@@ -43,8 +43,8 @@ public class FoodDetailService {
             FoodComplete foodComplete = optionalFoodComplete.get();
 
             foodDiary.setDate(date);
-            foodDiary.setStartEatingTime(parseTime(foodDetailDto.getStartEatingTime()));
-            foodDiary.setEndEatingTime(parseTime(foodDetailDto.getEndEatingTime()));
+            foodComplete.setStartEatingTime(parseTime(foodDetailDto.getStartEatingTime()));
+            foodComplete.setEndEatingTime(parseTime(foodDetailDto.getEndEatingTime()));
             foodDiary.setEatingType(FoodDiary.EatingType.valueOf(foodDetailDto.getEatingType()));
             foodDiary.setMenuName(foodDetailDto.getMenuName());
             foodDiary.setPhotoUrl(foodDetailDto.getPhotoUrl());
@@ -91,11 +91,11 @@ public class FoodDetailService {
         foodDetailDto.setEatingWhereOther(foodDiary.getEatingWhereOther());
         foodDetailDto.setFeeling(foodDiary.getFeeling().name());
 
-        if (foodDiary.getStartEatingTime() != null) {
-            foodDetailDto.setStartEatingTime(foodDiary.getStartEatingTime().toString());
+        if (foodComplete.getStartEatingTime() != null) {
+            foodDetailDto.setStartEatingTime(foodComplete.getStartEatingTime().toString());
         }
-        if (foodDiary.getEndEatingTime() != null) {
-            foodDetailDto.setEndEatingTime(foodDiary.getEndEatingTime().toString());
+        if (foodComplete.getEndEatingTime() != null) {
+            foodDetailDto.setEndEatingTime(foodComplete.getEndEatingTime().toString());
         }
         if (foodComplete.getAfterfeeling() != null) {
             foodDetailDto.setAfterFeeling(foodComplete.getAfterfeeling().name());

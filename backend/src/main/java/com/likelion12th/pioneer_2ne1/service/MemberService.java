@@ -229,7 +229,7 @@ public class MemberService  {
         // 폭식 증상 시 통계
         List<FoodDiary> diaries = getDiariesWithBingeSymptom(memberId);
         Map<FoodDiary.EatingType, Long> bingeEatingTypeCounts = getBingeEatingTypeCounts(diaries);
-        LocalTime averageBingeEatingTime = getAverageBingeEatingTime(diaries);
+        LocalTime averageBingeEatingTime = getAverageBingeEatingTime();
         Map<FoodDiary.Feeling, Long> top3BingeFeelings = getTop3BingeFeelings(diaries);
         Map<FoodComplete.Afterfeeling, Long> top3BingeAfterFeelings = getTop3BingeAfterFeelings(diaries);
 
@@ -354,17 +354,18 @@ public class MemberService  {
                 .collect(Collectors.groupingBy(FoodDiary::getEatingType, Collectors.counting()));
 
     }
-    public LocalTime getAverageBingeEatingTime(List<FoodDiary> diaries) {
+    public LocalTime getAverageBingeEatingTime() {
         // 식사 시간 저장할 리스트
         List<LocalTime> eatingTimes = new ArrayList<>();
 
-        // BINGE 증상이 있는 FoodComplete 객체에서 관련된 식사 일기의 시간을 수집
-        for (FoodDiary foodDiary : diaries) {
-            LocalTime eatingTime = foodDiary.getTime();
+        List<FoodComplete> foodCompletes = foodCompleteRepository.findFoodCompleteBySymptoms(FoodComplete.Symptom.BINGE);
+
+
+        for (FoodComplete foodComplete : foodCompletes) {
+            LocalTime eatingTime = foodComplete.getStartEatingTime();
             if (eatingTime != null) {
                 eatingTimes.add(eatingTime);
             }
-
         }
         System.out.println("eatingTimes: " + eatingTimes);
 

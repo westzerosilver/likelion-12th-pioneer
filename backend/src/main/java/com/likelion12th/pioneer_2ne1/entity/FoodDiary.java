@@ -24,8 +24,6 @@ public class FoodDiary {
 
     private LocalDate date;
     private LocalTime time;
-    private LocalTime startEatingTime;
-    private LocalTime endEatingTime;
 
     @Enumerated(EnumType.STRING)
     private EatingType eatingType;
