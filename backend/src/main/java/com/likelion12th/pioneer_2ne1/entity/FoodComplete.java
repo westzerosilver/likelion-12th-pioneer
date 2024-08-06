@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalTime;
 import java.util.Set;
 
 @Entity
@@ -20,6 +21,9 @@ public class FoodComplete {
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
+
+    private LocalTime startEatingTime;
+    private LocalTime endEatingTime;
 
     @Enumerated(EnumType.STRING)
     private Afterfeeling afterfeeling;

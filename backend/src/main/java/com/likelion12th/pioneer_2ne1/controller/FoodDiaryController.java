@@ -49,4 +49,5 @@ public class FoodDiaryController {
         foodDiaryService.deleteFoodDiary(id);
         return ResponseEntity.noContent().build();
     }
+
 }
