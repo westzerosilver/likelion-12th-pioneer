@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 
 @RestController
@@ -30,8 +32,9 @@ public class FoodDetailController {
     @PutMapping("/{date}/{id}")
     public ResponseEntity<FoodDetailDto> updateFoodDiary(@PathVariable("id") Long id,
                                                          @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-                                                         @RequestBody FoodDetailDto foodDetailDto) {
-        FoodDetailDto updatedFoodDiary = foodDetailService.updateFoodDiary(date, id, foodDetailDto);
+                                                         @RequestPart(name = "foodDetailDto") FoodDetailDto foodDetailDto,
+                                                         @RequestPart(value = "photoFile", required = false) MultipartFile photoFile) throws IOException {
+        FoodDetailDto updatedFoodDiary = foodDetailService.updateFoodDiary(date, id, foodDetailDto, photoFile);
         return ResponseEntity.ok(updatedFoodDiary);
     }
 

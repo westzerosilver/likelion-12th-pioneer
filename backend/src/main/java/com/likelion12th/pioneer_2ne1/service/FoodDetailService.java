@@ -6,13 +6,18 @@ import com.likelion12th.pioneer_2ne1.entity.FoodDiary;
 import com.likelion12th.pioneer_2ne1.repository.FoodCompleteRepository;
 import com.likelion12th.pioneer_2ne1.repository.FoodDiaryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalTime;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +27,9 @@ public class FoodDetailService {
 
     @Autowired
     private FoodCompleteRepository foodCompleteRepository;
+
+    @Value("${uploadPath}")
+    private String uploadPath;
 
     public FoodDetailDto getFoodDiaryDetailById(LocalDate date, Long id) {
         Optional<FoodDiary> foodDiary = foodDiaryRepository.findByIdAndDate(id, date);
@@ -34,7 +42,7 @@ public class FoodDetailService {
         return null;
     }
 
-    public FoodDetailDto updateFoodDiary(LocalDate date, Long id, FoodDetailDto foodDetailDto) {
+    public FoodDetailDto updateFoodDiary(LocalDate date, Long id, FoodDetailDto foodDetailDto, MultipartFile photoFile) throws IOException {
         Optional<FoodDiary> optionalFoodDiary = foodDiaryRepository.findByIdAndDate(id, date);
         Optional<FoodComplete> optionalFoodComplete = foodCompleteRepository.findById(id);
 
@@ -47,11 +55,18 @@ public class FoodDetailService {
             foodComplete.setEndEatingTime(parseTime(foodDetailDto.getEndEatingTime()));
             foodDiary.setEatingType(FoodDiary.EatingType.valueOf(foodDetailDto.getEatingType()));
             foodDiary.setMenuName(foodDetailDto.getMenuName());
-            foodDiary.setPhotoUrl(foodDetailDto.getPhotoUrl());
+            if (photoFile != null && !photoFile.isEmpty()) {
+                UUID uuid = UUID.randomUUID();
+                String fileName = uuid.toString() + "_" + photoFile.getOriginalFilename();
+                File itemImgFile = new File(uploadPath, fileName);
+                photoFile.transferTo(itemImgFile);
+                foodDiary.setPhotoUrl(fileName);
+                foodDiary.setPhotoUrlPath(uploadPath + "/" + fileName);
+            }
             foodDiary.setEatingWith(FoodDiary.EatingWith.valueOf(foodDetailDto.getEatingWith()));
             foodDiary.setEatingWithOther(foodDetailDto.getEatingWithOther());
             foodDiary.setEatingWhere(FoodDiary.EatingWhere.valueOf(foodDetailDto.getEatingWhere()));
-            foodDiary.setEatingWhereOther(foodDiary.getEatingWhereOther());
+            foodDiary.setEatingWhereOther(foodDetailDto.getEatingWhereOther());
             foodDiary.setFeeling(FoodDiary.Feeling.valueOf(foodDetailDto.getFeeling()));
 
             foodComplete.setAfterfeeling(FoodComplete.Afterfeeling.valueOf(foodDetailDto.getAfterFeeling()));
