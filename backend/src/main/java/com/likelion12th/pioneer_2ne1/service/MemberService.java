@@ -166,8 +166,11 @@ public class MemberService  {
             File itemImgFile = new File(uploadPath, fileName);
             profileImg.transferTo(itemImgFile);
             member.setProfileImg(fileName);
-            member.setProfileImgPath(uploadPath+ "/" + fileName);
-
+            member.setProfileImgPath("/uploads/" + fileName);
+        } else if (profileDto.getProfileImgPath() != null && profileDto.getProfileImgPath().isEmpty()) {
+            member.setProfileImgPath("");
+        } else if (profileDto.getProfileImgPath() == null) {
+            // profileImgPath가 null이고 프로필 이미지가 업로드되지 않은 경우
         }
 
         memberRepository.save(member);

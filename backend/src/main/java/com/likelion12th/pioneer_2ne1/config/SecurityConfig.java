@@ -118,6 +118,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/api/members/login", "/", "/api/members/join", "/api/members/logout").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
+                        .requestMatchers("/uploads/**").permitAll()
 //                        .requestMatchers("/members/**").hasRole("ADMIN")
                         .requestMatchers("/api/fooddiaries/**").authenticated()
                         .requestMatchers("/api/foodcomplete/**").authenticated()

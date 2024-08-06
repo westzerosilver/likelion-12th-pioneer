@@ -3,6 +3,7 @@ package com.likelion12th.pioneer_2ne1.config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -21,6 +22,12 @@ public class CorsMvcConfig implements WebMvcConfigurer {
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","))
                 .allowCredentials(true).maxAge(3600)
                 .allowedOrigins("http://3.37.81.68");
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:/home/ec2-user/app/image_upload/");
     }
 
 //    @Override
