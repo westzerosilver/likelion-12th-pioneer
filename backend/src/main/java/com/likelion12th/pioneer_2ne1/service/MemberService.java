@@ -61,6 +61,7 @@ public class MemberService  {
 
         MainDto mainDto = new MainDto();
         mainDto.setName(member.getName());
+        mainDto.setDate(member.getComplementDate());
 
         return mainDto;
     }
